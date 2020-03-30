@@ -49,9 +49,4 @@ double get_freq_tx();
 void set_freq_tx(double fLO_in, void *mapped_base);
 void read_bin_file(char *filename, int *array, int *N);
 
-/* Proprietary tools below. */
-void zynq_test(int mode, void *mapped_base);
-void write_table(int *table, int xfr_size, int target, int addr, void *mapped_base);
-void read_table(int *table, int xfr_size, int target, int addr, void *mapped_base);
-
-#endif // MIRACLELIB_H
+#endif // MIRACLELIB_H_
