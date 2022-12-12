@@ -10,18 +10,13 @@
 
 #include "common/eridan_cmd.h"
 
-
 #define MAXLINE 1024 
-    
-// Driver code 
-int main() { 
-    int sockfd; 
-    char buffer[MAXLINE]; 
-    char *hello = "Hello from client";
 
-    eridan_cmd_hdr_t *hdr;
-    eridan_cmd_req_t *req;
-    struct sockaddr_in     servaddr; 
+ecm_ctrl_t
+connect_to_server()
+{
+    struct sockaddr_in     servaddr;
+    int sockfd;
 
     // Creating socket file descriptor 
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
@@ -34,9 +29,20 @@ int main() {
     // Filling server information 
     servaddr.sin_family = AF_INET; 
     servaddr.sin_port = htons(EC_SERVER_PORT); 
-    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1"); 
+    servaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
 
-    int n, len; 
+    return ECM_SUCCESS;
+}
+
+int main()
+{ 
+    char buffer[MAXLINE]; 
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
+
+    int n, len;
+
+    int sockfd = connect_to_server();
 
     hdr = malloc(sizeof(eridan_cmd_hdr_t));
     memset(hdr, 0, sizeof(eridan_cmd_hdr_t));

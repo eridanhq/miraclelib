@@ -62,4 +62,9 @@ typedef struct eridan_cmd_resp_s {
     uint16_t            cmd_results[];
 } eridan_cmd_resp_t;
 
+typedef enum ecm_ctrl_ {
+    ECM_FAILURE = -1,
+    ECM_SUCCESS
+} ecm_ctrl_t;
+
 #endif

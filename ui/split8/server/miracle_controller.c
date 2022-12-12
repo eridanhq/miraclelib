@@ -12,11 +12,6 @@
 
 #include "common/eridan_cmd.h"
 
-typedef enum ecm_ctrl_ {
-    ECM_FAILURE = -1,
-    ECM_SUCCESS
-} ecm_ctrl_t;
-
 fd_set fdset;
 int    udpfd, lfd;
 
