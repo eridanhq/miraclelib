@@ -18,7 +18,28 @@ typedef struct eridan_node_addr_s {
 } eridan_node_addr_t;
 
 typedef enum eridan_cmd_id_e {
-    ERIDAN_CMD_SYSINIT   = 0,
+    ERIDAN_CMD_SYSINIT          = 0,
+    ERIDAN_CMD_GET_FREQ         = 1,
+    ERIDAN_CMD_GET_STATS        = 2,
+    ERIDAN_CMD_SET_FREQ         = 3,
+    ERIDAN_CMD_GET_PWR          = 4,
+    ERIDAN_CMD_SET_PWR          = 5,
+    ERIDAN_CMD_GET_SAMPLE_RATE  = 6,
+    ERIDAN_CMD_SET_SAMPLE_RATE  = 7,
+    ERIDAN_CMD_GET_RXFREQ       = 8,
+    ERIDAN_CMD_SET_RXFREQ       = 9,
+    ERIDAN_CMD_GET_RXSAMPLERATE = 10,
+    ERIDAN_CMD_SET_RXSAMPLERATE = 11,
+    ERIDAN_CMD_GET_RXGAINS      = 12,
+    ERIDAN_CMD_SET_RXGAINS      = 13,
+    ERIDAN_CMD_SYSOFF           = 14,
+    ERIDAN_CMD_START_SCP        = 15,
+    ERIDAN_CMD_PREP_SCP         = 16,
+    ERIDAN_CMD_RESET_NOW        = 17,
+    ERIDAN_CMD_RESET_DONE       = 18,
+    ERIDAN_CMD_SEND_UPDATES     = 19,
+    ERIDAN_CMD_CHECK_UPDATES    = 20,
+    ERIDAN_CMD_GET_VERSION      = 21,
 } eridan_cmd_id_t;
 
 typedef struct eridan_cmd_req_s {

@@ -77,26 +77,36 @@ ecm_ctrl_t
 handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
 {
     eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    ssize_t n;
+    int clen = sizeof(*caddr);
 
-    printf("Starting to handle ecm_cmds");
+    printf("\n\nStarting to handle ecm_cmds\n");
     hdr = (eridan_cmd_hdr_t *)rbuf;
     printf("This is what we got:\n");
-    printf("Got in cmd cookie : %x", hdr->cookie);
-    printf("Got in cmd version: %x", hdr->version);
-    printf("Got in cmd type: %x", hdr->type);
-    printf("Got in cmd length: %x", hdr->length);
-    printf("Got in cmd reserved: %x", hdr->reserved);
+    printf("Got in cmd cookie : %x\n",  hdr->cookie);
+    printf("Got in cmd version: %x\n",  hdr->version);
+    printf("Got in cmd type: %x\n",     hdr->type);
+    printf("Got in cmd length: %x\n",   hdr->length);
+    printf("Got in cmd reserved: %x\n", hdr->reserved);
+
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    n = recvfrom(udpfd, (const char *)req, sizeof(eridan_cmd_req_t),
+                        0,
+                        (const struct sockaddr *)&caddr, (unsigned int *)&clen);
+
+    printf("Got req from client\n");
 
     reply = malloc(sizeof(eridan_cmd_hdr_t));
     memset(reply, 0, sizeof(eridan_cmd_hdr_t));
     reply->cookie  = EC_MAGIC_COOKIE;
     reply->version = 0;
     reply->length  = 20;
-        
+
     sendto(udpfd,  (const char *)reply, sizeof(eridan_cmd_hdr_t), 
-                    MSG_CONFIRM, (const struct sockaddr *)caddr,
-                    sizeof(*
-                        caddr));
+                   MSG_CONFIRM,
+                   (const struct sockaddr *)&caddr, sizeof(*caddr));
 
     return ECM_FAILURE;
 }
@@ -122,7 +132,7 @@ handle_conns(void)
         if (FD_ISSET(udpfd, &fdset)) {
             int clen = sizeof(caddr);
             memset(rbuf, 0, sizeof(rbuf));
-            n = recvfrom(udpfd, rbuf, sizeof(rbuf), 0,
+            n = recvfrom(udpfd, rbuf, sizeof(eridan_cmd_hdr_t), 0,
                          (struct sockaddr *)&caddr, (unsigned int *)&clen);
             handle_cmds(rbuf, sizeof(rbuf), (struct sockaddr *)&caddr);
         }
@@ -137,10 +147,10 @@ handle_conns(void)
 int
 main(int argc, char *argv[]) 
 {
-    printf("Hello, Welcome to Miracle Controller Server\n");
+    printf("Hello, Welcome to Miracle Controller Server!!!\n");
 
     ecm_ctrl_init();
-    start_server(9400);
+    start_server(EC_SERVER_PORT);
     handle_conns();
 
     exit(0);
