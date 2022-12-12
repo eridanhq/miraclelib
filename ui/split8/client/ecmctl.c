@@ -59,7 +59,7 @@ int main() {
     n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),  
                          MSG_WAITALL,
                          (struct sockaddr *) &servaddr, (unsigned int *)&len); 
-    buffer[n] = '\0'; 
+    buffer[n] = '\0';
     printf("Server : %s\n", buffer); 
     
     close(sockfd); 
