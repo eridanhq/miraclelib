@@ -79,19 +79,867 @@ do_sysinit(void)
 void
 do_getfreq(void)
 {
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_FREQ;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
     return;
 }
 
 void
 do_getstats(void)
 {
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_STATS;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_setfreq(void)
+{
+        struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SET_FREQ;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_getpwr(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_PWR;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_setpwr(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SET_PWR;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_getsamplerate(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_SAMPLE_RATE;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_setsamplerate(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SET_SAMPLE_RATE;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_getrxfreq(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_RXFREQ;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_setrxfreq(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SET_RXFREQ;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_getrxsamplerate(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_RXSAMPLERATE;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_setrxsamplerate(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SET_RXSAMPLERATE;
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_getrxgains(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_RXGAINS;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_setrxgains(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SET_RXFREQ;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_sysoff(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SYSOFF;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_startscp(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_START_SCP;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_prepscp(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_PREP_SCP;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_resetnow(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_RESET_NOW;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_resetdone(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_RESET_DONE;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_sendupdates(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_SEND_UPDATES;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_checkupdates(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_CHECK_UPDATES;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
+    return;
+}
+
+void
+do_getversion(void)
+{
+    struct sockaddr_in  servaddr;
+    char buffer[MAXLINE];
+    int n, len;
+    eridan_cmd_hdr_t *hdr, *reply;
+    eridan_cmd_req_t *req;
+    int sockfd = connect_to_server(&servaddr);
+
+    hdr = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
+    hdr->cookie  = EC_MAGIC_COOKIE;
+    hdr->version = EC_VERSION;
+    hdr->length  = 20;
+    hdr->type    = EC_TYPE_REQ;
+    req   = malloc(sizeof(eridan_cmd_req_t));
+    memset(req, 0, sizeof(eridan_cmd_req_t));
+    req->reqid   = 0x3434;
+    req->cmdid   = ERIDAN_CMD_GET_VERSION;
+
+    sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+                    MSG_CONFIRM,
+                    (const struct sockaddr *) &servaddr, sizeof(servaddr));
+    printf("Hello message sent.\n");
+
+    len = sizeof(servaddr);
+    n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+    printf("Recved %d bytes from server\n", n);
+    reply = (eridan_cmd_hdr_t *)buffer;
+    printf("Server : %x\n", reply->cookie);
+
+    close(sockfd);
     return;
 }
 
 void
 Usage(void)
 {
-    printf("Print all long options here\n");
+printf("Print all long options here\n");
     return;
 }
 
@@ -166,90 +1014,92 @@ parse_args(int argc, char *argv[])
 
         case ERIDAN_CMD_GET_PWR:
             puts("doing getpwr\n");
+            do_getpwr();
             break;
 
         case ERIDAN_CMD_SET_PWR:
             puts("doing setpwr\n");
+            do_setpwr();
             break;
 
         case ERIDAN_CMD_GET_SAMPLE_RATE:
             puts("doing getsamplerate\n");
+            do_getsamplerate();
             break;
 
         case ERIDAN_CMD_SET_SAMPLE_RATE:
             puts("doing setsamplerate\n");
+            do_setsamplerate();
             break;
 
         case ERIDAN_CMD_GET_RXFREQ:
             puts("doing getrxfreq\n");
+            do_getrxfreq();
             break;
 
         case ERIDAN_CMD_SET_RXFREQ:
             puts("doing setrxfreq\n");
+            do_setrxfreq();
             break;
 
         case ERIDAN_CMD_GET_RXSAMPLERATE:
             puts("doing getrxsamplerate\n");
+            do_getrxsamplerate();
             break;
 
         case ERIDAN_CMD_SET_RXSAMPLERATE:
             puts("doing setrxsamplerate\n");
+            do_setrxsamplerate();
             break;
 
         case ERIDAN_CMD_GET_RXGAINS:
             puts("doing getrxgains\n");
+            do_getrxgains();
             break;
 
         case ERIDAN_CMD_SET_RXGAINS:
             puts("doing setrxgains\n");
+            do_setrxgains();
             break;
 
         case ERIDAN_CMD_SYSOFF:
             puts("doing sysoff\n");
+            do_sysoff();
             break;
 
         case ERIDAN_CMD_START_SCP:
             puts("doing startscp\n");
+            do_startscp();
             break;
 
         case ERIDAN_CMD_PREP_SCP:
             puts("doing prepscp\n");
+            do_prepscp();
             break;
 
         case ERIDAN_CMD_RESET_NOW:
             puts("doing resetnow\n");
+            do_resetnow();
             break;
 
         case ERIDAN_CMD_RESET_DONE:
             puts("doing resetdone\n");
+            do_resetdone();
             break;
 
         case ERIDAN_CMD_SEND_UPDATES:
             puts("doing sendupdates\n");
+            do_sendupdates();
             break;
 
         case ERIDAN_CMD_CHECK_UPDATES:
             puts("doing checkupdates\n");
+            do_checkupdates();
             break;
 
         case ERIDAN_CMD_GET_VERSION:
             puts("doing getversion\n");
-            break;
-
-        case 'b':
-            puts ("option -b\n");
-            break;
-
-        case 'c':
-            printf ("option -c with value `%s'\n", optarg);
-            break;
-
-        case 'd':
-            printf ("option -d with value `%s'\n", optarg);
-            break;
-
-        case 'f':
-            printf ("option -f with value `%s'\n", optarg);
+            do_getversion();
             break;
 
         case 'h':
