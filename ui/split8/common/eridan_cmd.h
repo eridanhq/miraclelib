@@ -3,6 +3,9 @@
 
 #define EC_MAGIC_COOKIE 0x45435246
 #define EC_SERVER_PORT  9400
+#define EC_VERSION      0x01
+#define EC_TYPE_REQ     0xA5
+#define EC_TYPE_RESP    0xB6
 
 typedef struct eridan_cmd_hdr_s {
     uint32_t             cookie;
@@ -46,7 +49,7 @@ typedef struct eridan_cmd_req_s {
     eridan_node_addr_t  from;
     eridan_node_addr_t  to;
     uint16_t            reqid;
-    uint32_t            pre_shared_ke;
+    uint32_t            pre_shared_key;
     eridan_cmd_id_t     cmdid;
     uint16_t            num_args;
     uint16_t            cmd_args[];
@@ -56,7 +59,7 @@ typedef struct eridan_cmd_resp_s {
     eridan_node_addr_t  from;
     eridan_node_addr_t  to;
     uint16_t            reqid;
-    uint32_t            pre_shared_ke;
+    uint32_t            pre_shared_key;
     eridan_cmd_id_t     cmdid;
     uint16_t            num_results;
     uint16_t            cmd_results[];
