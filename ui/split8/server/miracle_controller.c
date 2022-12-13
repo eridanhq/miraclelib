@@ -68,6 +68,34 @@ start_server(int port)
     return ECM_SUCCESS;
 }
 
+static inline eridan_cmd_hdr_t *
+get_reply_hdr()
+{
+    eridan_cmd_hdr_t *reply;
+
+    reply = malloc(sizeof(eridan_cmd_hdr_t));
+    memset(reply, 0, sizeof(eridan_cmd_hdr_t));
+    reply->cookie  = EC_MAGIC_COOKIE;
+    reply->version = EC_VERSION;
+    reply->type    = EC_TYPE_RESP;
+    reply->length  = 20;
+
+    return reply;
+}
+
+static inline eridan_cmd_resp_t *
+get_reply_body(eridan_cmd_req_t *req)
+{
+    eridan_cmd_resp_t *rbody;
+
+    rbody = malloc(sizeof(eridan_cmd_resp_t));
+    memset(rbody, 0, sizeof(eridan_cmd_resp_t));
+    rbody->reqid = req->reqid;
+    rbody->cmdid = req->cmdid;
+
+    return rbody;
+}
+
 ecm_ctrl_t
 handle_sysinit(eridan_cmd_req_t *req)
 {
@@ -205,6 +233,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
 {
     eridan_cmd_hdr_t *hdr, *reply;
     eridan_cmd_req_t *req;
+    eridan_cmd_resp_t *resp;
     ssize_t n;
     int clen = sizeof(*caddr);
 
@@ -319,16 +348,15 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
     }
 
-    reply = malloc(sizeof(eridan_cmd_hdr_t));
-    memset(reply, 0, sizeof(eridan_cmd_hdr_t));
-    reply->cookie  = EC_MAGIC_COOKIE;
-    reply->version = EC_VERSION;
-    reply->type    = EC_TYPE_RESP;
-    reply->length  = 20;
 
+    reply = get_reply_hdr();
+    resp  = get_reply_body(req);
     sendto(udpfd,  (const char *)reply, sizeof(eridan_cmd_hdr_t), 
                    MSG_CONFIRM,
                    (const struct sockaddr *)&caddr, sizeof(*caddr));
+    sendto(udpfd,  (const char *)resp, sizeof(eridan_cmd_resp_t),
+                    MSG_CONFIRM,
+                   (const struct sockaddr *) &caddr, sizeof(*caddr));
 
     return ECM_FAILURE;
 }
@@ -361,10 +389,10 @@ handle_conns(void)
     }
 }
 
-// No need of handling args for now
+// No need of handling args for now   OK
 // Create file for debug prints
-// Read from socket
-// parse cmds and reply
+// Read from socket                   DONE
+// parse cmds and reply               DONE
 // test program on bats               DONE
 int
 main(int argc, char *argv[]) 
