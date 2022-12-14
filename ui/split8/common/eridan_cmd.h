@@ -1,11 +1,12 @@
 #ifndef _ERIDAN_CMD_H_
 #define _ERIDAN_CMD_H_
 
-#define EC_MAGIC_COOKIE 0x45435246
-#define EC_SERVER_PORT  9400
-#define EC_VERSION      0x01
-#define EC_TYPE_REQ     0xA5
-#define EC_TYPE_RESP    0xB6
+#define EC_MAGIC_COOKIE  0x45435246
+#define EC_SERVER_PORT   9400
+#define EC_VERSION       0x01
+#define EC_TYPE_REQ      0xA5
+#define EC_TYPE_RESP     0xB6
+#define EC_CHAR_STR_SIZE 64
 
 typedef struct eridan_cmd_hdr_s {
     uint32_t             cookie;
@@ -52,7 +53,7 @@ typedef struct eridan_cmd_req_s {
     uint32_t            pre_shared_key;
     eridan_cmd_id_t     cmdid;
     uint16_t            num_args;
-    uint16_t            cmd_args[];
+    char                cmd_args[];
 } eridan_cmd_req_t;
 
 typedef struct eridan_cmd_resp_s {
@@ -62,7 +63,7 @@ typedef struct eridan_cmd_resp_s {
     uint32_t            pre_shared_key;
     eridan_cmd_id_t     cmdid;
     uint16_t            num_results;
-    uint16_t            cmd_results[];
+    char                cmd_results[];
 } eridan_cmd_resp_t;
 
 typedef enum ecm_ctrl_ {
