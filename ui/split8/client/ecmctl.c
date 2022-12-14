@@ -18,15 +18,13 @@ connect_to_server(struct sockaddr_in *servaddr)
 {
     int sockfd;
 
-    // Creating socket file descriptor 
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) { 
         perror("socket creation failed"); 
         exit(EXIT_FAILURE); 
     }
 
     memset(servaddr, 0, sizeof(servaddr));
-        
-    // Filling server information 
+
     servaddr->sin_family = AF_INET;
     servaddr->sin_port = htons(EC_SERVER_PORT);
     servaddr->sin_addr.s_addr = inet_addr("127.0.0.1");
@@ -903,13 +901,14 @@ do_getversion(void)
     int n, len;
     eridan_cmd_hdr_t *hdr, *reply;
     eridan_cmd_req_t *req;
+    eridan_cmd_resp_t *resp;
     int sockfd = connect_to_server(&servaddr);
 
     hdr = malloc(sizeof(eridan_cmd_hdr_t));
     memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
     hdr->cookie  = EC_MAGIC_COOKIE;
     hdr->version = EC_VERSION;
-    hdr->length  = 20;
+    hdr->length  = sizeof(eridan_cmd_req_t);
     hdr->type    = EC_TYPE_REQ;
     req   = malloc(sizeof(eridan_cmd_req_t));
     memset(req, 0, sizeof(eridan_cmd_req_t));
@@ -927,10 +926,17 @@ do_getversion(void)
     len = sizeof(servaddr);
     n = recvfrom(sockfd, (char *)buffer, sizeof(eridan_cmd_hdr_t),
                          MSG_WAITALL,
-                         (struct sockaddr *) &servaddr, (unsigned int *)&len); 
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len);
     printf("Recved %d bytes from server\n", n);
     reply = (eridan_cmd_hdr_t *)buffer;
     printf("Server : %x\n", reply->cookie);
+    printf("Size: %d\n", reply->length);
+    int rlen = reply->length;
+    n = recvfrom(sockfd, (char *)buffer, rlen+35,
+                         MSG_WAITALL,
+                         (struct sockaddr *) &servaddr, (unsigned int *)&len);
+    resp = (eridan_cmd_resp_t *)buffer;
+    printf("Response: %s\n", resp->cmd_results);
 
     close(sockfd);
     return;
@@ -939,7 +945,7 @@ do_getversion(void)
 void
 Usage(void)
 {
-printf("Print all long options here\n");
+    printf("Print all long options here\n");
     return;
 }
 

@@ -84,11 +84,11 @@ get_reply_hdr()
 }
 
 static inline eridan_cmd_resp_t *
-get_reply_body(eridan_cmd_req_t *req)
+get_reply_body(eridan_cmd_req_t *req, int num_args)
 {
     eridan_cmd_resp_t *rbody;
 
-    rbody = malloc(sizeof(eridan_cmd_resp_t));
+    rbody = malloc(sizeof(eridan_cmd_resp_t)+num_args*EC_CHAR_STR_SIZE);
     memset(rbody, 0, sizeof(eridan_cmd_resp_t));
     rbody->reqid = req->reqid;
     rbody->cmdid = req->cmdid;
@@ -223,8 +223,19 @@ handle_check_updates(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_get_version(eridan_cmd_req_t *req)
+handle_get_version(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *verstr = "1.1";
+    //const = "1.1";
+    resp  = get_reply_body(req, 1);
+    resp->num_results = 1;
+    /* Note : use of flexible array in C */
+    //memcpy(resp->cmd_results, verstr, strlen(verstr)+1);
+    strcpy(resp->cmd_results, verstr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -341,7 +352,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_VERSION:
-            handle_get_version(req);
+            handle_get_version(req, &resp);
         break;
 
         default:
@@ -350,13 +361,18 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
 
 
     reply = get_reply_hdr();
-    resp  = get_reply_body(req);
+    reply->length = sizeof(*resp);
+    //resp  = get_reply_body(req, 0);
     sendto(udpfd,  (const char *)reply, sizeof(eridan_cmd_hdr_t), 
                    MSG_CONFIRM,
                    (const struct sockaddr *)&caddr, sizeof(*caddr));
-    sendto(udpfd,  (const char *)resp, sizeof(eridan_cmd_resp_t),
+    sendto(udpfd,  (const char *)resp, sizeof(*resp)+resp->num_results*EC_CHAR_STR_SIZE,
                     MSG_CONFIRM,
                    (const struct sockaddr *) &caddr, sizeof(*caddr));
+
+    free(req);
+    free(reply);
+    free(resp);
 
     return ECM_FAILURE;
 }
