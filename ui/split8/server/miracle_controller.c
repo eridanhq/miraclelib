@@ -12,6 +12,8 @@
 
 #include "common/eridan_cmd.h"
 
+#define  ERIDAN_PATH "/opt/eridan/user"
+
 fd_set fdset;
 int    udpfd, lfd;
 
@@ -88,6 +90,7 @@ get_reply_body(eridan_cmd_req_t *req, int num_args)
 {
     eridan_cmd_resp_t *rbody;
 
+    /* Note : use of flexible array in C */
     rbody = malloc(sizeof(eridan_cmd_resp_t)+num_args*EC_CHAR_STR_SIZE);
     memset(rbody, 0, sizeof(eridan_cmd_resp_t));
     rbody->reqid = req->reqid;
@@ -97,8 +100,21 @@ get_reply_body(eridan_cmd_req_t *req, int num_args)
 }
 
 ecm_ctrl_t
-handle_sysinit(eridan_cmd_req_t *req)
+handle_sysinit(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysinit");
+    system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -227,7 +243,7 @@ handle_get_version(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
     eridan_cmd_resp_t *resp;
     const char *verstr = "1.1";
-    //const = "1.1";
+
     resp  = get_reply_body(req, 1);
     resp->num_results = 1;
     /* Note : use of flexible array in C */
@@ -268,7 +284,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
     switch (req->cmdid)
     {
         case ERIDAN_CMD_SYSINIT:
-            handle_sysinit(req);
+            handle_sysinit(req, &resp);
         break;
 
         case ERIDAN_CMD_GET_FREQ:
