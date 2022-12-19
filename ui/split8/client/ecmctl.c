@@ -42,8 +42,10 @@ print_response(eridan_cmd_resp_t *resp)
     return;
 }
 
-ecm_ctrl_t
-send_request(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_id_t cmdid)
+#define ECMCTL_REQID 0x3434
+
+static inline ecm_ctrl_t
+get_request(int cmdid, int num_args, eridan_cmd_hdr_t **phdr, eridan_cmd_req_t **preq)
 {
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
@@ -54,17 +56,38 @@ send_request(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_id_t cmdid)
     hdr->version = EC_VERSION;
     hdr->length  = sizeof(eridan_cmd_req_t);
     hdr->type    = EC_TYPE_REQ;
-    req   = malloc(sizeof(eridan_cmd_req_t));
-    memset(req, 0, sizeof(eridan_cmd_req_t));
-    req->reqid   = 0x3434;
+    req   = malloc(sizeof(eridan_cmd_req_t)+num_args*EC_CHAR_STR_SIZE);
+    memset(req, 0, sizeof(eridan_cmd_req_t)+num_args*EC_CHAR_STR_SIZE);
+    req->reqid   = ECMCTL_REQID;
     req->cmdid   = cmdid;
 
+    *phdr = hdr;
+    *preq = req;
+
+    return ECM_SUCCESS;
+}
+
+static inline ecm_ctrl_t
+send_request_out(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_hdr_t *hdr, eridan_cmd_req_t *req)
+{
     sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
                     MSG_CONFIRM,
                     (const struct sockaddr *) servaddr, sizeof(*servaddr));
     sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
                     MSG_CONFIRM,
                     (const struct sockaddr *) servaddr, sizeof(*servaddr));
+
+    return ECM_SUCCESS;
+}
+
+ecm_ctrl_t
+send_request(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_id_t cmdid)
+{
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
+
+    get_request(cmdid, 0, &hdr, &req);
+    send_request_out(sockfd, servaddr, hdr, req);
 
     free(hdr);
     free(req);
@@ -107,7 +130,7 @@ do_sysinit(void)
     int sockfd = connect_to_server(&servaddr);
 
     send_request(sockfd, &servaddr, ERIDAN_CMD_SYSINIT);
-    printf("Hello message sent.\n");
+    printf("Sysinit message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
@@ -123,12 +146,21 @@ do_getfreq(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_FREQ);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_FREQ, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    //send_request(sockfd, &servaddr, ERIDAN_CMD_GET_FREQ);
+    printf("Getfreq message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -475,10 +507,49 @@ do_getversion(void)
     return;
 }
 
+typedef struct ecmctl_options_s {
+    char            *optname;
+    eridan_cmd_id_t cmdid;
+    char            *description;
+    char            *help;
+} ecmctl_options_t;
+
+ecmctl_options_t ecmctl_options[] = {
+    {.optname= "verbose",         .help="Run Verbose", .description="Describe me", },
+    {.optname= "help",            .help="Print Help", .description="Describe me", },
+    {.optname= "sysinit",         .help="Initialize Eridan Radio", .description="Describe me", .cmdid=ERIDAN_CMD_SYSINIT},
+    {.optname= "getfreq",         .help="Get TX Frequency", .description="Describe me", .cmdid=ERIDAN_CMD_GET_FREQ},
+    {.optname= "getstats",        .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_STATS},
+    {.optname= "setfreq",         .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_FREQ},
+    {.optname= "getpwr",          .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_PWR},
+    {.optname= "setpwr",          .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_PWR},
+    {.optname= "getsamplerate",   .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_SAMPLE_RATE},
+    {.optname= "setsamplerate",   .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_SAMPLE_RATE},
+    {.optname= "getrxfreq",       .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXFREQ},
+    {.optname= "setrxfreq",       .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXFREQ},
+    {.optname= "getrxsamplerate", .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXSAMPLERATE},
+    {.optname= "setrxsamplerate", .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXSAMPLERATE},
+    {.optname= "getrxgains",      .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXGAINS},
+    {.optname= "setrxgains",      .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXGAINS},
+    {.optname= "sysoff",          .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SYSOFF},
+    {.optname= "startscp",        .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_START_SCP},
+    {.optname= "prepscp",         .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_PREP_SCP},
+    {.optname= "resetnow",        .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_RESET_NOW},
+    {.optname= "resetdone",       .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_RESET_DONE},
+    {.optname= "sendupdates",     .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SEND_UPDATES},
+    {.optname= "checkupdates",    .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_CHECK_UPDATES},
+    {.optname= "getversion",      .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_VERSION},
+};
+
+#define NUM_ECM_OPTIONS (sizeof(ecmctl_options)/sizeof(ecmctl_options_t))
+
 void
 Usage(void)
 {
-    printf("Print all long options here\n");
+    printf("Ecmctl take the following options:\n");
+    for (int i = 0; i < NUM_ECM_OPTIONS; i++) {
+        printf("\t%-10s\t -\t %s\n", ecmctl_options[i].optname, ecmctl_options[i].help);
+    }
     return;
 }
 
