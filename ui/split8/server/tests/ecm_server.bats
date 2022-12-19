@@ -7,7 +7,7 @@ load '../../bats/test/libs/bats-assert/load'
 }
 
 @test "Server exists" {
-  [ -f miracle_controller ]
+  [ -f ../server/miracle_controller ]
 }
 
 @test "Help message from server" {
