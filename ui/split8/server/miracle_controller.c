@@ -119,14 +119,40 @@ handle_sysinit(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 }
 
 ecm_ctrl_t
-handle_get_freq(eridan_cmd_req_t *req)
+handle_get_freq(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "getfreq");
+    system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
 ecm_ctrl_t
-handle_get_stats(eridan_cmd_req_t *req)
+handle_get_stats(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "getstat");
+    system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -137,8 +163,21 @@ handle_set_freq(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_get_pwr(eridan_cmd_req_t *req)
+handle_get_pwr(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "getpwr");
+    system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -149,8 +188,21 @@ handle_set_pwr(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_get_sample_rate(eridan_cmd_req_t *req)
+handle_get_sample_rate(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "getsamplerate");
+    system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -161,8 +213,22 @@ handle_set_sample_rate(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_get_rxfreq(eridan_cmd_req_t *req)
+handle_get_rxfreq(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    //snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysinit");
+    //system(cmd);
+    // TODO add 
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -173,8 +239,21 @@ handle_set_rxfreq(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_get_rxsamplerate(eridan_cmd_req_t *req)
+handle_get_rxsamplerate(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    //snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysinit");
+    //system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -185,8 +264,21 @@ handle_set_rxsamplerate(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_get_rxgains(eridan_cmd_req_t *req)
+handle_get_rxgains(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    //snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysinit");
+    //system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -197,8 +289,21 @@ handle_set_rxgains(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_sysoff(eridan_cmd_req_t *req)
+handle_sysoff(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    //snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysinit");
+    //system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -288,11 +393,11 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_FREQ:
-            handle_get_freq(req);
+            handle_get_freq(req, &resp);
         break;
 
         case ERIDAN_CMD_GET_STATS:
-            handle_get_stats(req);
+            handle_get_stats(req, &resp);
         break;
 
         case ERIDAN_CMD_SET_FREQ:
@@ -300,7 +405,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_PWR:
-            handle_get_pwr(req);
+            handle_get_pwr(req, &resp);
         break;
 
         case ERIDAN_CMD_SET_PWR:
@@ -308,7 +413,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_SAMPLE_RATE:
-            handle_get_sample_rate(req);
+            handle_get_sample_rate(req, &resp);
         break;
 
         case ERIDAN_CMD_SET_SAMPLE_RATE:
@@ -316,7 +421,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_RXFREQ:
-            handle_get_rxfreq(req);
+            handle_get_rxfreq(req, &resp);
         break;
 
         case ERIDAN_CMD_SET_RXFREQ:
@@ -324,7 +429,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_RXSAMPLERATE:
-            handle_set_rxsamplerate(req);
+            handle_get_rxsamplerate(req, &resp);
         break;
 
         case ERIDAN_CMD_SET_RXSAMPLERATE:
@@ -332,7 +437,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_GET_RXGAINS:
-            handle_get_rxgains(req);
+            handle_get_rxgains(req, &resp);
         break;
 
         case ERIDAN_CMD_SET_RXGAINS:
@@ -340,7 +445,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_SYSOFF:
-            handle_sysoff(req);
+            handle_sysoff(req, &resp);
         break;
 
         case ERIDAN_CMD_START_SCP:
