@@ -71,4 +71,30 @@ typedef enum ecm_ctrl_ {
     ECM_SUCCESS
 } ecm_ctrl_t;
 
+/* Note : Keep this uptodate with eridan_cmd_t */
+static const char * const cmd_names[] = {
+    [ERIDAN_CMD_SYSINIT]          = "Sysinit",
+    [ERIDAN_CMD_GET_FREQ]         = "Getfreq",
+    [ERIDAN_CMD_GET_STATS]        = "Getstats",
+    [ERIDAN_CMD_SET_FREQ]         = "Setfreq",
+    [ERIDAN_CMD_GET_PWR]          = "Getpwr",
+    [ERIDAN_CMD_SET_PWR]          = "Setpwr",
+    [ERIDAN_CMD_GET_SAMPLE_RATE]  = "Getsamplerate",
+    [ERIDAN_CMD_SET_SAMPLE_RATE]  = "Setsamplerate",
+    [ERIDAN_CMD_GET_RXFREQ]       = "Getrxfreq",
+    [ERIDAN_CMD_SET_RXFREQ]       = "Setrxfreq",
+    [ERIDAN_CMD_GET_RXSAMPLERATE] = "Getrxsamplerate",
+    [ERIDAN_CMD_SET_RXSAMPLERATE] = "Setrxsamplerate",
+    [ERIDAN_CMD_GET_RXGAINS]      = "Getrxgains",
+    [ERIDAN_CMD_SET_RXGAINS]      = "Setrxgains",
+    [ERIDAN_CMD_SYSOFF]           = "Sysoff",
+    [ERIDAN_CMD_START_SCP]        = "StartSCP",
+    [ERIDAN_CMD_PREP_SCP]         = "PrepSCP",
+    [ERIDAN_CMD_RESET_NOW]        = "ResetNow",
+    [ERIDAN_CMD_RESET_DONE]       = "ResetDone",
+    [ERIDAN_CMD_SEND_UPDATES]     = "SendUpdates",
+    [ERIDAN_CMD_CHECK_UPDATES]    = "CheckUpdates",
+    [ERIDAN_CMD_GET_VERSION]      = "GetVersion"
+};
+
 #endif
