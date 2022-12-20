@@ -36,7 +36,7 @@ static inline void
 print_response(eridan_cmd_resp_t *resp)
 {
     printf("Req no: %x\n", resp->reqid);
-    printf("Command was: %d\n", resp->cmdid);
+    printf("Command was: %s\n", cmd_names[resp->cmdid]);
     printf("Response: %s\n", resp->cmd_results);
 
     return;
@@ -154,7 +154,6 @@ do_getfreq(void)
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
 
-    //send_request(sockfd, &servaddr, ERIDAN_CMD_GET_FREQ);
     printf("Getfreq message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
@@ -172,12 +171,20 @@ do_getstats(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_STATS);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_STATS, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Getstats message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -190,13 +197,21 @@ do_setfreq(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SET_FREQ);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_FREQ, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Setfreq message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
-    free(resp);
+    free(hdr);
+    free(req);
     close(sockfd);
     return;
 }
@@ -207,12 +222,20 @@ do_getpwr(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_PWR);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_PWR, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Getpwr message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -224,12 +247,21 @@ do_setpwr(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SET_PWR);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_PWR, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "1000");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Setpwr message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -241,12 +273,20 @@ do_getsamplerate(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_SAMPLE_RATE);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_SAMPLE_RATE, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Getsamplerate message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -258,12 +298,21 @@ do_setsamplerate(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SET_SAMPLE_RATE);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_SAMPLE_RATE, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Setsamplerate message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -275,12 +324,20 @@ do_getrxfreq(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_RXFREQ);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_RXFREQ, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Getrxfreq message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -292,12 +349,21 @@ do_setrxfreq(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SET_RXFREQ);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_RXFREQ, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Setrxfreq message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -309,12 +375,20 @@ do_getrxsamplerate(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_RXSAMPLERATE);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_RXSAMPLERATE, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Getrxsamplerate message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -326,12 +400,21 @@ do_setrxsamplerate(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SET_RXSAMPLERATE);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_RXSAMPLERATE, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Setrxsamplerate message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -343,12 +426,20 @@ do_getrxgains(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_GET_RXGAINS);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_GET_RXGAINS, 1, &hdr, &req);
+    req->num_args = 1;
+    strcpy(req->cmd_args, "TRX1");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Getrxgains message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -360,12 +451,21 @@ do_setrxgains(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SET_RXFREQ);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_RXGAINS, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Setrxgains message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -379,7 +479,7 @@ do_sysoff(void)
     int sockfd = connect_to_server(&servaddr);
 
     send_request(sockfd, &servaddr, ERIDAN_CMD_SYSOFF);
-    printf("Hello message sent.\n");
+    printf("Sysoff message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
@@ -515,30 +615,30 @@ typedef struct ecmctl_options_s {
 } ecmctl_options_t;
 
 ecmctl_options_t ecmctl_options[] = {
-    {.optname= "verbose",         .help="Run Verbose", .description="Describe me", },
-    {.optname= "help",            .help="Print Help", .description="Describe me", },
-    {.optname= "sysinit",         .help="Initialize Eridan Radio", .description="Describe me", .cmdid=ERIDAN_CMD_SYSINIT},
-    {.optname= "getfreq",         .help="Get TX Frequency", .description="Describe me", .cmdid=ERIDAN_CMD_GET_FREQ},
-    {.optname= "getstats",        .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_STATS},
-    {.optname= "setfreq",         .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_FREQ},
-    {.optname= "getpwr",          .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_PWR},
-    {.optname= "setpwr",          .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_PWR},
-    {.optname= "getsamplerate",   .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_SAMPLE_RATE},
-    {.optname= "setsamplerate",   .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_SAMPLE_RATE},
-    {.optname= "getrxfreq",       .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXFREQ},
-    {.optname= "setrxfreq",       .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXFREQ},
-    {.optname= "getrxsamplerate", .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXSAMPLERATE},
-    {.optname= "setrxsamplerate", .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXSAMPLERATE},
-    {.optname= "getrxgains",      .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXGAINS},
-    {.optname= "setrxgains",      .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXGAINS},
-    {.optname= "sysoff",          .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SYSOFF},
-    {.optname= "startscp",        .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_START_SCP},
-    {.optname= "prepscp",         .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_PREP_SCP},
-    {.optname= "resetnow",        .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_RESET_NOW},
-    {.optname= "resetdone",       .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_RESET_DONE},
-    {.optname= "sendupdates",     .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_SEND_UPDATES},
-    {.optname= "checkupdates",    .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_CHECK_UPDATES},
-    {.optname= "getversion",      .help="Ecm help", .description="Describe me", .cmdid=ERIDAN_CMD_GET_VERSION},
+    {.optname= "verbose",         .help="Run Verbose",                .description="Describe me", },
+    {.optname= "help",            .help="Print Help",                 .description="Describe me", },
+    {.optname= "sysinit",         .help="Initialize Eridan Radio",    .description="Describe me", .cmdid=ERIDAN_CMD_SYSINIT},
+    {.optname= "getfreq",         .help="Get TX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_GET_FREQ},
+    {.optname= "getstats",        .help="Get Radio Stats",            .description="Describe me", .cmdid=ERIDAN_CMD_GET_STATS},
+    {.optname= "setfreq",         .help="Set TX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_SET_FREQ},
+    {.optname= "getpwr",          .help="Get TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_GET_PWR},
+    {.optname= "setpwr",          .help="Set TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_SET_PWR},
+    {.optname= "getsamplerate",   .help="Get TX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_GET_SAMPLE_RATE},
+    {.optname= "setsamplerate",   .help="Set TX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_SET_SAMPLE_RATE},
+    {.optname= "getrxfreq",       .help="Get RX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXFREQ},
+    {.optname= "setrxfreq",       .help="Set RX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXFREQ},
+    {.optname= "getrxsamplerate", .help="Get RX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXSAMPLERATE},
+    {.optname= "setrxsamplerate", .help="Set RX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXSAMPLERATE},
+    {.optname= "getrxgains",      .help="Get RX Gains",               .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXGAINS},
+    {.optname= "setrxgains",      .help="Set RX Gains",               .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXGAINS},
+    {.optname= "sysoff",          .help="Turnoff Eridan Radio",       .description="Describe me", .cmdid=ERIDAN_CMD_SYSOFF},
+    {.optname= "startscp",        .help="Start SCP",                  .description="Describe me", .cmdid=ERIDAN_CMD_START_SCP},
+    {.optname= "prepscp",         .help="Prepare for SCP",            .description="Describe me", .cmdid=ERIDAN_CMD_PREP_SCP},
+    {.optname= "resetnow",        .help="Reset Eridan unit Now",      .description="Describe me", .cmdid=ERIDAN_CMD_RESET_NOW},
+    {.optname= "resetdone",       .help="Reset Completed",            .description="Describe me", .cmdid=ERIDAN_CMD_RESET_DONE},
+    {.optname= "sendupdates",     .help="Server to send updates to",  .description="Describe me", .cmdid=ERIDAN_CMD_SEND_UPDATES},
+    {.optname= "checkupdates",    .help="Check update socket",        .description="Describe me", .cmdid=ERIDAN_CMD_CHECK_UPDATES},
+    {.optname= "getversion",      .help="Get Eridan C plain version", .description="Describe me", .cmdid=ERIDAN_CMD_GET_VERSION},
 };
 
 #define NUM_ECM_OPTIONS (sizeof(ecmctl_options)/sizeof(ecmctl_options_t))
