@@ -157,8 +157,22 @@ handle_get_stats(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 }
 
 ecm_ctrl_t
-handle_set_freq(eridan_cmd_req_t *req)
+handle_set_freq(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s %s %s", ERIDAN_PATH, "setfreq", req->cmd_args, req->cmd_args+EC_CHAR_STR_SIZE);
+    system(cmd);
+    printf("Executing [%s]\n", cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -182,8 +196,21 @@ handle_get_pwr(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 }
 
 ecm_ctrl_t
-handle_set_pwr(eridan_cmd_req_t *req)
+handle_set_pwr(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "setpwr");
+    system(cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -297,8 +324,8 @@ handle_sysoff(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 
     resp  = get_reply_body(req, 1);
     memset(cmd, 0, sizeof(cmd));
-    //snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysinit");
-    //system(cmd);
+    snprintf(cmd, sizeof(cmd), "%s/%s", ERIDAN_PATH, "sysoff");
+    system(cmd);
     resp->num_results = 1;
     strcpy(resp->cmd_results, replystr);
 
@@ -375,12 +402,12 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
     printf("Got in cmd cookie : %x\n",  hdr->cookie);
     printf("Got in cmd version: %x\n",  hdr->version);
     printf("Got in cmd type: %x\n",     hdr->type);
-    printf("Got in cmd length: %x\n",   hdr->length);
+    printf("Got in cmd length: %d\n",   hdr->length);
     printf("Got in cmd reserved: %x\n", hdr->reserved);
 
-    req   = malloc(sizeof(eridan_cmd_req_t));
-    memset(req, 0, sizeof(eridan_cmd_req_t));
-    n = recvfrom(udpfd, (const char *)req, sizeof(eridan_cmd_req_t),
+    req   = malloc(sizeof(eridan_cmd_req_t)+hdr->length);
+    memset(req, 0, sizeof(eridan_cmd_req_t)+hdr->length);
+    n = recvfrom(udpfd, (const char *)req, sizeof(eridan_cmd_req_t)+hdr->length,
                         0,
                         (const struct sockaddr *)&caddr, (unsigned int *)&clen);
 
@@ -401,7 +428,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_SET_FREQ:
-            handle_set_freq(req);
+            handle_set_freq(req, &resp);
         break;
 
         case ERIDAN_CMD_GET_PWR:
@@ -409,7 +436,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_SET_PWR:
-            handle_set_pwr(req);
+            handle_set_pwr(req, &resp);
         break;
 
         case ERIDAN_CMD_GET_SAMPLE_RATE:

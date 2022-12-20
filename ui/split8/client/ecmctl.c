@@ -33,9 +33,19 @@ connect_to_server(struct sockaddr_in *servaddr)
 }
 
 static inline void
+print_request(eridan_cmd_req_t *req)
+{
+    printf("Request no: %x\n", req->reqid);
+    printf("Command was: %s\n", cmd_names[req->cmdid]);
+    printf("Arguments: %s\n", req->cmd_args);
+
+    return;
+}
+
+static inline void
 print_response(eridan_cmd_resp_t *resp)
 {
-    printf("Req no: %x\n", resp->reqid);
+    printf("Response no: %x\n", resp->reqid);
     printf("Command was: %s\n", cmd_names[resp->cmdid]);
     printf("Response: %s\n", resp->cmd_results);
 
@@ -73,7 +83,7 @@ send_request_out(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_hdr_t *hdr
     sendto(sockfd,  (const char *)hdr, sizeof(eridan_cmd_hdr_t),
                     MSG_CONFIRM,
                     (const struct sockaddr *) servaddr, sizeof(*servaddr));
-    sendto(sockfd,  (const char *)req, sizeof(eridan_cmd_req_t),
+    sendto(sockfd,  (const char *)req, hdr->length,
                     MSG_CONFIRM,
                     (const struct sockaddr *) servaddr, sizeof(*servaddr));
 
@@ -150,6 +160,7 @@ do_getfreq(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_FREQ, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -175,6 +186,7 @@ do_getstats(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_STATS, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -202,11 +214,13 @@ do_setfreq(void)
 
     get_request(ERIDAN_CMD_SET_FREQ, 2, &hdr, &req);
     req->num_args = 2;
+    hdr->length += 2*EC_CHAR_STR_SIZE;
     strcpy(req->cmd_args, "TRX1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setfreq message sent.\n");
+    printf("Req length:%d\n", hdr->length);
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
@@ -226,6 +240,7 @@ do_getpwr(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_PWR, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -251,6 +266,7 @@ do_setpwr(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_SET_PWR, 2, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args, "TRX1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "1000");
@@ -277,6 +293,7 @@ do_getsamplerate(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_SAMPLE_RATE, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -302,6 +319,7 @@ do_setsamplerate(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_SET_SAMPLE_RATE, 2, &hdr, &req);
+    hdr->length += 2*EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args, "TRX1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
@@ -328,6 +346,7 @@ do_getrxfreq(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_RXFREQ, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -353,6 +372,7 @@ do_setrxfreq(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_SET_RXFREQ, 2, &hdr, &req);
+    hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args, "TRX1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
@@ -379,6 +399,7 @@ do_getrxsamplerate(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_RXSAMPLERATE, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -404,6 +425,7 @@ do_setrxsamplerate(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_SET_RXSAMPLERATE, 2, &hdr, &req);
+    hdr->length += 2*EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args, "TRX1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
@@ -430,6 +452,7 @@ do_getrxgains(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_GET_RXGAINS, 1, &hdr, &req);
+    hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
     strcpy(req->cmd_args, "TRX1");
     send_request_out(sockfd, &servaddr, hdr, req);
@@ -455,6 +478,7 @@ do_setrxgains(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_SET_RXGAINS, 2, &hdr, &req);
+    hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args, "TRX1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
@@ -498,6 +522,7 @@ do_startscp(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_START_SCP, 6, &hdr, &req);
+    hdr->length += 6 * EC_CHAR_STR_SIZE;
     req->num_args = 6;
     strcpy(req->cmd_args,                    "user1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
@@ -593,6 +618,7 @@ do_sendupdates(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_SEND_UPDATES, 2, &hdr, &req);
+    hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args,                    "3453");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
@@ -619,6 +645,7 @@ do_checkupdates(void)
     eridan_cmd_req_t *req;
 
     get_request(ERIDAN_CMD_CHECK_UPDATES, 2, &hdr, &req);
+    hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
     strcpy(req->cmd_args,                    "3453");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
