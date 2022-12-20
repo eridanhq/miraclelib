@@ -494,12 +494,25 @@ do_startscp(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_START_SCP);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_START_SCP, 6, &hdr, &req);
+    req->num_args = 6;
+    strcpy(req->cmd_args,                    "user1");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
+    strcpy(req->cmd_args+2*EC_CHAR_STR_SIZE, "/opt/img1.gz");
+    strcpy(req->cmd_args+3*EC_CHAR_STR_SIZE, "user2");
+    strcpy(req->cmd_args+4*EC_CHAR_STR_SIZE, "10.1.32.90");
+    strcpy(req->cmd_args+5*EC_CHAR_STR_SIZE, "/root/img2.gz");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("StartSCP message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -528,12 +541,19 @@ do_resetnow(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_RESET_NOW);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_RESET_NOW, 0, &hdr, &req);
+    req->num_args = 0;
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Resetnow message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -545,12 +565,19 @@ do_resetdone(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_RESET_DONE);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SET_RXGAINS, 0, &hdr, &req);
+    req->num_args = 0;
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Resetdone message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -562,12 +589,21 @@ do_sendupdates(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_SEND_UPDATES);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_SEND_UPDATES, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args,                    "3453");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Sendupdates message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -579,12 +615,21 @@ do_checkupdates(void)
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
+    eridan_cmd_hdr_t *hdr;
+    eridan_cmd_req_t *req;
 
-    send_request(sockfd, &servaddr, ERIDAN_CMD_CHECK_UPDATES);
-    printf("Hello message sent.\n");
+    get_request(ERIDAN_CMD_CHECK_UPDATES, 2, &hdr, &req);
+    req->num_args = 2;
+    strcpy(req->cmd_args,                    "3453");
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
+    send_request_out(sockfd, &servaddr, hdr, req);
+
+    printf("Checkupdates message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    free(hdr);
+    free(req);
     free(resp);
     close(sockfd);
     return;
@@ -598,7 +643,7 @@ do_getversion(void)
     int sockfd = connect_to_server(&servaddr);
 
     send_request(sockfd, &servaddr, ERIDAN_CMD_GET_VERSION);
-    printf("Hello message sent.\n");
+    printf("Getversion message sent.\n");
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
