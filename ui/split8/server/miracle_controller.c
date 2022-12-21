@@ -387,8 +387,36 @@ handle_sysoff(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 }
 
 ecm_ctrl_t
-handle_start_scp(eridan_cmd_req_t *req)
+handle_start_scp(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+    char srcusr[256], srcip[256], srcdir[256];
+    char dstusr[256], dstip[256], dstdir[256];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    memset(srcusr,  0, sizeof(srcusr));
+    memset(srcip,   0, sizeof(srcip));
+    memset(srcdir,  0, sizeof(srcdir));
+    memset(dstusr,  0, sizeof(dstusr));
+    memset(dstip,   0, sizeof(dstip));
+    memset(dstdir,  0, sizeof(dstdir));
+    strcpy(srcusr, req->cmd_args);
+    strcpy(srcip,  req->cmd_args+EC_CHAR_STR_SIZE);
+    strcpy(srcdir, req->cmd_args+2*EC_CHAR_STR_SIZE);
+    strcpy(dstusr, req->cmd_args+3*EC_CHAR_STR_SIZE);
+    strcpy(dstip,  req->cmd_args+4*EC_CHAR_STR_SIZE);
+    strcpy(dstdir, req->cmd_args+5*EC_CHAR_STR_SIZE);
+    snprintf(cmd, sizeof(cmd), "scp %s@%s:%s %s@%s:%s", srcusr, srcip, srcdir, dstusr, dstip, dstdir);
+    //system(cmd);
+    printf("Executing [%s]\n", cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -541,7 +569,7 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_START_SCP:
-            handle_start_scp(req);
+            handle_start_scp(req, &resp);
         break;
 
         case ERIDAN_CMD_PREP_SCP:
