@@ -68,6 +68,13 @@ $(OBJS): %.o : *.h %.c
 #$(MIRACLELIB): miraclelib.c miraclelib.h
 #	$(CC) $(GCCFLAGS) -c -o miraclelib.o miraclelib.c
 
+../bats:
+	echo "Failed without bats"
+
+.PHONY: tests
+
+tests: ../bats
+	(cd ../bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client.bats)
 
 clean:
 	# rm -f *.elf *.gdb *.o
