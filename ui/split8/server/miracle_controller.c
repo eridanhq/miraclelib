@@ -452,14 +452,52 @@ handle_reset_done(eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_send_updates(eridan_cmd_req_t *req)
+handle_send_updates(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+    char port[256], ip[256];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    memset(port,  0, sizeof(port));
+    memset(ip,   0, sizeof(ip));
+    strcpy(port, req->cmd_args);
+    strcpy(ip,  req->cmd_args+EC_CHAR_STR_SIZE);
+    snprintf(cmd, sizeof(cmd), "server %s:%s", port, ip);
+    //system(cmd);
+    printf("Executing [%s]\n", cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
 ecm_ctrl_t
-handle_check_updates(eridan_cmd_req_t *req)
+handle_check_updates(eridan_cmd_req_t *req, eridan_cmd_resp_t **prespgui)
 {
+    eridan_cmd_resp_t *resp;
+    const char *replystr = "DONE";
+    char cmd[1024];
+    char port[256], ip[256];
+
+    resp  = get_reply_body(req, 1);
+    memset(cmd, 0, sizeof(cmd));
+    memset(port,  0, sizeof(port));
+    memset(ip,   0, sizeof(ip));
+    strcpy(port, req->cmd_args);
+    strcpy(ip,  req->cmd_args+EC_CHAR_STR_SIZE);
+    snprintf(cmd, sizeof(cmd), "server %s:%s", port, ip);
+    //system(cmd);
+    printf("Executing [%s]\n", cmd);
+    resp->num_results = 1;
+    strcpy(resp->cmd_results, replystr);
+
+    *presp = resp;
+
     return ECM_SUCCESS;
 }
 
@@ -585,11 +623,11 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
         break;
 
         case ERIDAN_CMD_SEND_UPDATES:
-            handle_send_updates(req);
+            handle_send_updates(req, &resp);
         break;
 
         case ERIDAN_CMD_CHECK_UPDATES:
-            handle_check_updates(req);
+            handle_check_updates(req, &resp);
         break;
 
         case ERIDAN_CMD_GET_VERSION:
