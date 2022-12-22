@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <getopt.h>
+#include <sys/time.h>
 #include <sys/types.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
@@ -29,6 +30,14 @@ connect_to_server(struct sockaddr_in *servaddr)
     servaddr->sin_port = htons(EC_SERVER_PORT);
     servaddr->sin_addr.s_addr = inet_addr("127.0.0.1");
 
+    struct timeval tv;
+    tv.tv_sec = 10;
+    tv.tv_usec = 0;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO, &tv, sizeof(tv)) < 0) {
+        perror("Error");
+        exit(EXIT_FAILURE);
+    }
+
     return sockfd;
 }
 
@@ -45,6 +54,11 @@ print_request(eridan_cmd_req_t *req)
 static inline void
 print_response(eridan_cmd_resp_t *resp)
 {
+    if (resp == NULL)
+    {
+        printf("Response error\n");
+        return;
+    }
     printf("Response no: %x\n", resp->reqid);
     printf("Command was: %s\n", cmd_names[resp->cmdid]);
     printf("Response: %s\n", resp->cmd_results);
@@ -115,9 +129,12 @@ get_response(int sockfd, struct sockaddr_in *servaddr)
     hdr = malloc(sizeof(eridan_cmd_hdr_t));
     memset(hdr, 0, sizeof(eridan_cmd_hdr_t));
     len = sizeof(servaddr);
-    n = recvfrom(sockfd, hdr, sizeof(eridan_cmd_hdr_t),
+    n = recvfrom(sockfd, hdr, sizeof(eridan_cmd_hdr_t), /* XXX timeout */
                          MSG_WAITALL,
                          (struct sockaddr *) &servaddr, (unsigned int *)&len);
+    if (n <= 0) {
+        return NULL;
+    }
     printf("Recved %d bytes from server\n", n);
     //reply = (eridan_cmd_hdr_t *)buffer;
     resp = malloc(hdr->length);
@@ -127,12 +144,16 @@ get_response(int sockfd, struct sockaddr_in *servaddr)
                          MSG_WAITALL,
                          (struct sockaddr *) &servaddr, (unsigned int *)&len);
     //resp = (eridan_cmd_resp_t *)buffer;
+    if (n <= 0) {
+        free(hdr);
+        return NULL;
+    }
 
     free(hdr);
     return resp;
 }
 
-void
+ecm_ctrl_t
 do_sysinit(void)
 {
     eridan_cmd_resp_t *resp;
@@ -144,13 +165,17 @@ do_sysinit(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
 
-void
+ecm_ctrl_t
 do_getfreq(void)
 {
     eridan_cmd_resp_t *resp;
@@ -169,14 +194,20 @@ do_getfreq(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getstats(void)
 {
     eridan_cmd_resp_t *resp;
@@ -195,14 +226,20 @@ do_getstats(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_setfreq(void)
 {
 
@@ -224,13 +261,19 @@ do_setfreq(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getpwr(void)
 {
     eridan_cmd_resp_t *resp;
@@ -249,14 +292,20 @@ do_getpwr(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_setpwr(void)
 {
     eridan_cmd_resp_t *resp;
@@ -276,14 +325,20 @@ do_setpwr(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getsamplerate(void)
 {
     eridan_cmd_resp_t *resp;
@@ -302,14 +357,20 @@ do_getsamplerate(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_setsamplerate(void)
 {
     eridan_cmd_resp_t *resp;
@@ -329,14 +390,20 @@ do_setsamplerate(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getrxfreq(void)
 {
     eridan_cmd_resp_t *resp;
@@ -355,14 +422,20 @@ do_getrxfreq(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_setrxfreq(void)
 {
     eridan_cmd_resp_t *resp;
@@ -382,14 +455,20 @@ do_setrxfreq(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getrxsamplerate(void)
 {
     eridan_cmd_resp_t *resp;
@@ -408,14 +487,20 @@ do_getrxsamplerate(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_setrxsamplerate(void)
 {
     eridan_cmd_resp_t *resp;
@@ -435,14 +520,20 @@ do_setrxsamplerate(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getrxgains(void)
 {
     eridan_cmd_resp_t *resp;
@@ -461,14 +552,20 @@ do_getrxgains(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_setrxgains(void)
 {
     eridan_cmd_resp_t *resp;
@@ -488,14 +585,20 @@ do_setrxgains(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_sysoff(void)
 {
     eridan_cmd_resp_t *resp;
@@ -507,12 +610,15 @@ do_sysoff(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        return ECM_FAILURE;
+    }
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_startscp(void)
 {
     eridan_cmd_resp_t *resp;
@@ -536,14 +642,20 @@ do_startscp(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_prepscp(void)
 {
     eridan_cmd_resp_t *resp;
@@ -557,10 +669,10 @@ do_prepscp(void)
 
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_resetnow(void)
 {
     eridan_cmd_resp_t *resp;
@@ -577,14 +689,20 @@ do_resetnow(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_resetdone(void)
 {
     eridan_cmd_resp_t *resp;
@@ -601,14 +719,20 @@ do_resetdone(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_sendupdates(void)
 {
     eridan_cmd_resp_t *resp;
@@ -628,14 +752,20 @@ do_sendupdates(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_checkupdates(void)
 {
     eridan_cmd_resp_t *resp;
@@ -655,14 +785,20 @@ do_checkupdates(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        free(hdr);
+        free(req);
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(hdr);
     free(req);
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
-void
+ecm_ctrl_t
 do_getversion(void)
 {
     eridan_cmd_resp_t *resp;
@@ -674,16 +810,20 @@ do_getversion(void)
     resp = get_response(sockfd, &servaddr);
     print_response(resp);
 
+    if (resp == NULL) {
+        close(sockfd);
+        return ECM_FAILURE;
+    }
     free(resp);
     close(sockfd);
-    return;
+    return ECM_SUCCESS;
 }
 
 typedef struct ecmctl_options_s {
-    char            *optname;
     eridan_cmd_id_t cmdid;
-    char            *description;
-    char            *help;
+    const char      *optname;
+    const char      *description;
+    const char      *help;
 } ecmctl_options_t;
 
 ecmctl_options_t ecmctl_options[] = {
@@ -696,7 +836,6 @@ ecmctl_options_t ecmctl_options[] = {
     {.optname= "getpwr",          .help="Get TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_GET_PWR},
     {.optname= "setpwr",          .help="Set TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_SET_PWR},
     {.optname= "getsamplerate",   .help="Get TX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_GET_SAMPLE_RATE},
-    {.optname= "setsamplerate",   .help="Set TX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_SET_SAMPLE_RATE},
     {.optname= "getrxfreq",       .help="Get RX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXFREQ},
     {.optname= "setrxfreq",       .help="Set RX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXFREQ},
     {.optname= "getrxsamplerate", .help="Get RX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXSAMPLERATE},
@@ -713,7 +852,7 @@ ecmctl_options_t ecmctl_options[] = {
     {.optname= "getversion",      .help="Get Eridan C plain version", .description="Describe me", .cmdid=ERIDAN_CMD_GET_VERSION},
 };
 
-#define NUM_ECM_OPTIONS (sizeof(ecmctl_options)/sizeof(ecmctl_options_t))
+#define NUM_ECM_OPTIONS (int)(sizeof(ecmctl_options)/sizeof(ecmctl_options_t))
 
 void
 Usage(void)
@@ -776,112 +915,112 @@ parse_args(int argc, char *argv[])
         {
         case ERIDAN_CMD_SYSINIT:
             puts ("sysinit\n");
-            do_sysinit();
+            return do_sysinit();
             break;
 
         case ERIDAN_CMD_GET_FREQ:
             puts("doing getfreq\n");
-            do_getfreq();
+            return do_getfreq();
             break;
 
         case ERIDAN_CMD_GET_STATS:
             puts("doing getstats\n");
-            do_getstats();
+            return do_getstats();
             break;       
 
         case ERIDAN_CMD_SET_FREQ:
             puts("doing setfreq\n");
-            do_setfreq();
+            return do_setfreq();
             break;
 
         case ERIDAN_CMD_GET_PWR:
             puts("doing getpwr\n");
-            do_getpwr();
+            return do_getpwr();
             break;
 
         case ERIDAN_CMD_SET_PWR:
             puts("doing setpwr\n");
-            do_setpwr();
+            return do_setpwr();
             break;
 
         case ERIDAN_CMD_GET_SAMPLE_RATE:
             puts("doing getsamplerate\n");
-            do_getsamplerate();
+            return do_getsamplerate();
             break;
 
         case ERIDAN_CMD_SET_SAMPLE_RATE:
             puts("doing setsamplerate\n");
-            do_setsamplerate();
+            return do_setsamplerate();
             break;
 
         case ERIDAN_CMD_GET_RXFREQ:
             puts("doing getrxfreq\n");
-            do_getrxfreq();
+            return do_getrxfreq();
             break;
 
         case ERIDAN_CMD_SET_RXFREQ:
             puts("doing setrxfreq\n");
-            do_setrxfreq();
+            return do_setrxfreq();
             break;
 
         case ERIDAN_CMD_GET_RXSAMPLERATE:
             puts("doing getrxsamplerate\n");
-            do_getrxsamplerate();
+            return do_getrxsamplerate();
             break;
 
         case ERIDAN_CMD_SET_RXSAMPLERATE:
             puts("doing setrxsamplerate\n");
-            do_setrxsamplerate();
+            return do_setrxsamplerate();
             break;
 
         case ERIDAN_CMD_GET_RXGAINS:
             puts("doing getrxgains\n");
-            do_getrxgains();
+            return do_getrxgains();
             break;
 
         case ERIDAN_CMD_SET_RXGAINS:
             puts("doing setrxgains\n");
-            do_setrxgains();
+            return do_setrxgains();
             break;
 
         case ERIDAN_CMD_SYSOFF:
             puts("doing sysoff\n");
-            do_sysoff();
+            return do_sysoff();
             break;
 
         case ERIDAN_CMD_START_SCP:
             puts("doing startscp\n");
-            do_startscp();
+            return do_startscp();
             break;
 
         case ERIDAN_CMD_PREP_SCP:
             puts("doing prepscp\n");
-            do_prepscp();
+            return do_prepscp();
             break;
 
         case ERIDAN_CMD_RESET_NOW:
             puts("doing resetnow\n");
-            do_resetnow();
+            return do_resetnow();
             break;
 
         case ERIDAN_CMD_RESET_DONE:
             puts("doing resetdone\n");
-            do_resetdone();
+            return do_resetdone();
             break;
 
         case ERIDAN_CMD_SEND_UPDATES:
             puts("doing sendupdates\n");
-            do_sendupdates();
+            return do_sendupdates();
             break;
 
         case ERIDAN_CMD_CHECK_UPDATES:
             puts("doing checkupdates\n");
-            do_checkupdates();
+            return do_checkupdates();
             break;
 
         case ERIDAN_CMD_GET_VERSION:
             puts("doing getversion\n");
-            do_getversion();
+            return do_getversion();
             break;
 
         case 'h':
@@ -909,10 +1048,10 @@ parse_args(int argc, char *argv[])
 }
 
 int main(int argc, char *argv[])
-{ 
+{
 
     if (parse_args(argc, argv) == ECM_FAILURE) {
-        printf("Arguments unknown!\n");
+        printf("Command failed!\n");
         exit(EXIT_FAILURE);
     }
 
