@@ -14,9 +14,10 @@ bats:
 	mkdir -p bats
 	cd bats && git submodule update
 
-tests: bats
-	(cd bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client.bats)
-	(cd bats/ && test/libs/bats/bin/bats ../server/tests/ecm_server.bats)
+tests: | bats
+	(cd bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client.bats) || /bin/true
+	(cd bats/ && test/libs/bats/bin/bats ../server/tests/ecm_server.bats) || /bin/true
+	(cd bats/ && test/libs/bats/bin/bats ../server/tests/ecm_common.bats) || /bin/true
 
 clean:
 	rm -rf bats
