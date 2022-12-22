@@ -802,11 +802,7 @@ start_controller(void)
 
     return ECM_SUCCESS;
 }
-// No need of handling args for now   OK
-// Create file for debug prints
-// Read from socket                   DONE
-// parse cmds and reply               DONE
-// test program on bats               DONE
+
 int
 main(int argc, char *argv[]) 
 {
