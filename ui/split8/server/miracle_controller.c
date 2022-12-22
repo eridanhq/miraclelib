@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <getopt.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -477,7 +478,7 @@ handle_send_updates(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 }
 
 ecm_ctrl_t
-handle_check_updates(eridan_cmd_req_t *req, eridan_cmd_resp_t **prespgui)
+handle_check_updates(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
     eridan_cmd_resp_t *resp;
     const char *replystr = "DONE";
@@ -530,18 +531,19 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
     printf("\n\nStarting to handle ecm_cmds\n");
     hdr = (eridan_cmd_hdr_t *)rbuf;
     printf("This is what we got:\n");
-    printf("Got in cmd cookie : %x\n",  hdr->cookie);
+    printf("Got in cmd cookie : DOES %sMatch \n",  hdr->cookie==EC_MAGIC_COOKIE ? "": "NOT");
     printf("Got in cmd version: %x\n",  hdr->version);
     printf("Got in cmd type: %x\n",     hdr->type);
     printf("Got in cmd length: %d\n",   hdr->length);
     printf("Got in cmd reserved: %x\n", hdr->reserved);
+
 
     req   = malloc(sizeof(eridan_cmd_req_t)+hdr->length);
     memset(req, 0, sizeof(eridan_cmd_req_t)+hdr->length);
     n = recvfrom(udpfd, (const char *)req, sizeof(eridan_cmd_req_t)+hdr->length,
                         0,
                         (const struct sockaddr *)&caddr, (unsigned int *)&clen);
-
+    printf("Got cmd : %s\n", cmd_names[req->cmdid]);
     printf("Got req from client\n");
 
     switch (req->cmdid)
@@ -683,7 +685,123 @@ handle_conns(void)
         }
     }
 }
+void
+Usage(void)
+{
+    printf("Miracle controller take the following options:\n");
+    return;
+}
 
+void
+daemonize(void)
+{
+    /* Our process ID and Session ID */
+    pid_t pid, sid;
+
+    /* Fork off the parent process */
+    pid = fork();
+    if (pid < 0) {
+        exit(EXIT_FAILURE);
+    }
+    /* If we got a good PID, then
+       we can exit the parent process. */
+    if (pid > 0) {
+        exit(EXIT_SUCCESS);
+    }
+
+    /* Change the file mode mask */
+    umask(0);
+
+    /* Open any logs here */
+
+    /* Create a new SID for the child process */
+    sid = setsid();
+    if (sid < 0) {
+        /* Log the failure */
+        exit(EXIT_FAILURE);
+    }
+
+    /* Change the current working directory */
+    if ((chdir("/")) < 0) {
+        /* Log the failure */
+        exit(EXIT_FAILURE);
+    }
+
+    /* Close out the standard file descriptors */
+    close(STDIN_FILENO);
+    close(STDOUT_FILENO);
+    close(STDERR_FILENO);
+
+    return;
+}
+
+ecm_ctrl_t
+parse_args(int argc, char *argv[])
+{
+    int c;
+    static int verbose_flag;
+
+    /* Ref : https://www.gnu.org/software/libc/manual/html_node/Getopt-Long-Options.html */
+    while (1)
+    {
+        static struct option long_options[] =
+        {
+            {"verbose",         no_argument,       &verbose_flag, 1},
+            {"help",            no_argument,       0, 'h'},
+            {"bg",              no_argument,       0, 'b'},
+            {0, 0, 0, 0}
+        };
+        /* getopt_long stores the option index here. */
+        int option_index = 0;
+
+        c = getopt_long (argc, argv, "h",
+                         long_options, &option_index);
+
+        /* Detect the end of the options. */
+        if (c == -1)
+            break;
+
+        switch ((eridan_cmd_id_t)c)
+        {
+        case 'b':
+            ecm_ctrl_t res;
+            daemonize();
+            res = start_controller();
+            return ECM_SUCCESS;
+
+        case 'h':
+        case '?':
+            Usage();
+            return ECM_FAILURE;
+
+        default:
+            abort ();
+        }
+    }
+
+    if (verbose_flag)
+        puts ("verbose flag is set");
+
+    /* Print any remaining command line arguments (not options). */
+    if (optind < argc)
+    {
+        printf ("non-option ARGV-elements: ");
+        while (optind < argc)
+            printf ("%s ", argv[optind++]);
+        putchar ('\n');
+    }
+    return ECM_SUCCESS;
+}
+
+ecm_ctrl_t
+start_controller(void)
+{
+    ecm_ctrl_init();
+    start_server(EC_SERVER_PORT);
+    handle_conns();
+
+    return ECM_SUCCESS;
+}
 // No need of handling args for now   OK
 // Create file for debug prints
 // Read from socket                   DONE
@@ -694,9 +812,15 @@ main(int argc, char *argv[])
 {
     printf("Hello, Welcome to Miracle Controller Server!!!\n");
 
-    ecm_ctrl_init();
-    start_server(EC_SERVER_PORT);
-    handle_conns();
+    if (parse_args(argc, argv) == ECM_FAILURE) {
+        printf("Arguments unknown!\n");
+        exit(EXIT_FAILURE);
+    }
 
-    exit(0);
+    if (start_controller() == ECM_FAILURE) {
+        printf("Failed to start controller\n");
+        exit(EXIT_FAILURE);
+    }
+
+    exit(ECM_SUCCESS);
 }
