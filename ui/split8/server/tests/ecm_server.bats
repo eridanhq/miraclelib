@@ -7,7 +7,11 @@ load '../../bats/test/libs/bats-assert/load'
 }
 
 @test "Server exists" {
-  [ -f miracle_controller ]
+  echo $PWD/../server/miracle_controller 
+  run nohup $PWD/../server/miracle_controller &
+  #[ "$status-eq 0 ]
+  [ "$?" -eq 0 ]
+  assert_success
 }
 
 @test "Help message from server" {
@@ -19,7 +23,7 @@ load '../../bats/test/libs/bats-assert/load'
 }
 
 @test "Server responds to " {
-  
+  assert_success
 }
 
 #Sysinit
