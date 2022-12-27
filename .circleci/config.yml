@@ -11,9 +11,13 @@ jobs:
        - run:
            name: "Build Split E C plane"
            command: cd ui/split8 && make client && make server
+           no_output_timeout: 120m
+
        - run:
            name: "Unit tests:"
            command: cd ui/split8 && make tests
+           no_output_timeout: 120m
+
 workflows:
    miracle-workflow:
        jobs:
