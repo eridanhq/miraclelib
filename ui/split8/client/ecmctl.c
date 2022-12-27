@@ -104,6 +104,30 @@ send_request_out(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_hdr_t *hdr
     return ECM_SUCCESS;
 }
 
+static inline ecm_ctrl_t
+check_input_side(char *side)
+{
+    if (side == NULL)
+        return ECM_FAILURE;
+
+    if (strlen(side) > 5)
+        return ECM_FAILURE;
+
+    if (strlen(side) == 1 && (side[0] == '1' || side[0] == '2'))
+        return ECM_SUCCESS;
+
+    if (strlen(side) == 2 && (toupper(side[0]) == 'T' && (side[1] == '1' || side[1] == '2')))
+        return ECM_SUCCESS;
+
+    if (strlen(side) == 3 && (toupper(side[0]) == 'T' && toupper(side[1]) == 'X' && (side[2] == '1' || side[2] == '2') ))
+        return ECM_SUCCESS;
+
+    if (strlen(side) == 4 && (toupper(side[0]) == 'T' && toupper(side[1]) == 'R' && toupper(side[2]) == 'X' && (side[3] == '1' || side[3] == '2')))
+        return ECM_SUCCESS;
+
+    return ECM_FAILURE;
+}
+
 ecm_ctrl_t
 send_request(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_id_t cmdid)
 {
@@ -176,18 +200,20 @@ do_sysinit(void)
 
 
 ecm_ctrl_t
-do_getfreq(void)
+do_getfreq(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_FREQ, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getfreq message sent.\n");
@@ -208,18 +234,20 @@ do_getfreq(void)
 }
 
 ecm_ctrl_t
-do_getstats(void)
+do_getstats(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_STATS, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getstats message sent.\n");
@@ -240,20 +268,22 @@ do_getstats(void)
 }
 
 ecm_ctrl_t
-do_setfreq(void)
+do_setfreq(char *side, char *freq)
 {
 
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_FREQ, 2, &hdr, &req);
     req->num_args = 2;
     hdr->length += 2*EC_CHAR_STR_SIZE;
-    strcpy(req->cmd_args, "TRX1");
-    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    strcpy(req->cmd_args, side);
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, freq);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setfreq message sent.\n");
@@ -274,18 +304,20 @@ do_setfreq(void)
 }
 
 ecm_ctrl_t
-do_getpwr(void)
+do_getpwr(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_PWR, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getpwr message sent.\n");
@@ -306,7 +338,7 @@ do_getpwr(void)
 }
 
 ecm_ctrl_t
-do_setpwr(void)
+do_setpwr(char *side, char *pwr)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -314,11 +346,13 @@ do_setpwr(void)
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_SET_PWR, 2, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 2;
-    strcpy(req->cmd_args, "TRX1");
-    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "1000");
+    strcpy(req->cmd_args, side);
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, pwr);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setpwr message sent.\n");
@@ -339,7 +373,7 @@ do_setpwr(void)
 }
 
 ecm_ctrl_t
-do_getsamplerate(void)
+do_getsamplerate(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -347,10 +381,12 @@ do_getsamplerate(void)
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_GET_SAMPLE_RATE, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getsamplerate message sent.\n");
@@ -371,7 +407,7 @@ do_getsamplerate(void)
 }
 
 ecm_ctrl_t
-do_setsamplerate(void)
+do_setsamplerate(char *side, char *srate)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -379,11 +415,13 @@ do_setsamplerate(void)
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_SET_SAMPLE_RATE, 2, &hdr, &req);
     hdr->length += 2*EC_CHAR_STR_SIZE;
     req->num_args = 2;
-    strcpy(req->cmd_args, "TRX1");
-    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    strcpy(req->cmd_args, side);
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, srate);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setsamplerate message sent.\n");
@@ -404,7 +442,7 @@ do_setsamplerate(void)
 }
 
 ecm_ctrl_t
-do_getrxfreq(void)
+do_getrxfreq(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -412,10 +450,12 @@ do_getrxfreq(void)
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_GET_RXFREQ, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getrxfreq message sent.\n");
@@ -436,7 +476,7 @@ do_getrxfreq(void)
 }
 
 ecm_ctrl_t
-do_setrxfreq(void)
+do_setrxfreq(char *side, char *rxfreq)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -444,11 +484,13 @@ do_setrxfreq(void)
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_SET_RXFREQ, 2, &hdr, &req);
     hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
-    strcpy(req->cmd_args, "TRX1");
-    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    strcpy(req->cmd_args, side);
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, rxfreq);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setrxfreq message sent.\n");
@@ -469,7 +511,7 @@ do_setrxfreq(void)
 }
 
 ecm_ctrl_t
-do_getrxsamplerate(void)
+do_getrxsamplerate(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -477,10 +519,12 @@ do_getrxsamplerate(void)
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_GET_RXSAMPLERATE, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getrxsamplerate message sent.\n");
@@ -501,19 +545,21 @@ do_getrxsamplerate(void)
 }
 
 ecm_ctrl_t
-do_setrxsamplerate(void)
+do_setrxsamplerate(char *side, char *rxsrate)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_RXSAMPLERATE, 2, &hdr, &req);
     hdr->length += 2*EC_CHAR_STR_SIZE;
     req->num_args = 2;
-    strcpy(req->cmd_args, "TRX1");
-    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    strcpy(req->cmd_args, side);
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, rxsrate);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setrxsamplerate message sent.\n");
@@ -534,18 +580,20 @@ do_setrxsamplerate(void)
 }
 
 ecm_ctrl_t
-do_getrxgains(void)
+do_getrxgains(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_RXGAINS, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
-    strcpy(req->cmd_args, "TRX1");
+    strcpy(req->cmd_args, side);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Getrxgains message sent.\n");
@@ -566,19 +614,21 @@ do_getrxgains(void)
 }
 
 ecm_ctrl_t
-do_setrxgains(void)
+do_setrxgains(char *side, char *rxgains)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_RXGAINS, 2, &hdr, &req);
     hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
-    strcpy(req->cmd_args, "TRX1");
-    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, "3.2e4");
+    strcpy(req->cmd_args, side);
+    strcpy(req->cmd_args+EC_CHAR_STR_SIZE, rxgains);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("Setrxgains message sent.\n");
@@ -853,6 +903,7 @@ ecmctl_options_t ecmctl_options[] = {
 };
 
 #define NUM_ECM_OPTIONS (int)(sizeof(ecmctl_options)/sizeof(ecmctl_options_t))
+#define BUFSIZE         (256)
 
 void
 Usage(void)
@@ -878,19 +929,19 @@ parse_args(int argc, char *argv[])
             {"verbose",         no_argument,       &verbose_flag, 1},
             {"help",            no_argument,       0, 'h'},
             {"sysinit",         no_argument,       0, ERIDAN_CMD_SYSINIT},
-            {"getfreq",         no_argument,       0, ERIDAN_CMD_GET_FREQ},
-            {"getstats",        no_argument,       0, ERIDAN_CMD_GET_STATS},
+            {"getfreq",         required_argument, 0, ERIDAN_CMD_GET_FREQ},
+            {"getstats",        required_argument, 0, ERIDAN_CMD_GET_STATS},
             {"setfreq",         required_argument, 0, ERIDAN_CMD_SET_FREQ},
-            {"getpwr",          no_argument,       0, ERIDAN_CMD_GET_PWR},
-            {"setpwr",          no_argument,       0, ERIDAN_CMD_SET_PWR},
-            {"getsamplerate",   no_argument,       0, ERIDAN_CMD_GET_SAMPLE_RATE},
-            {"setsamplerate",   no_argument,       0, ERIDAN_CMD_SET_SAMPLE_RATE},
-            {"getrxfreq",       no_argument,       0, ERIDAN_CMD_GET_RXFREQ},
-            {"setrxfreq",       no_argument,       0, ERIDAN_CMD_SET_RXFREQ},
-            {"getrxsamplerate", no_argument,       0, ERIDAN_CMD_GET_RXSAMPLERATE},
-            {"setrxsamplerate", no_argument,       0, ERIDAN_CMD_SET_RXSAMPLERATE},
-            {"getrxgains",      no_argument,       0, ERIDAN_CMD_GET_RXGAINS},
-            {"setrxgains",      no_argument,       0, ERIDAN_CMD_SET_RXGAINS},
+            {"getpwr",          required_argument, 0, ERIDAN_CMD_GET_PWR},
+            {"setpwr",          required_argument, 0, ERIDAN_CMD_SET_PWR},
+            {"getsamplerate",   required_argument, 0, ERIDAN_CMD_GET_SAMPLE_RATE},
+            {"setsamplerate",   required_argument, 0, ERIDAN_CMD_SET_SAMPLE_RATE},
+            {"getrxfreq",       required_argument, 0, ERIDAN_CMD_GET_RXFREQ},
+            {"setrxfreq",       required_argument, 0, ERIDAN_CMD_SET_RXFREQ},
+            {"getrxsamplerate", required_argument, 0, ERIDAN_CMD_GET_RXSAMPLERATE},
+            {"setrxsamplerate", required_argument, 0, ERIDAN_CMD_SET_RXSAMPLERATE},
+            {"getrxgains",      required_argument, 0, ERIDAN_CMD_GET_RXGAINS},
+            {"setrxgains",      required_argument, 0, ERIDAN_CMD_SET_RXGAINS},
             {"sysoff",          no_argument,       0, ERIDAN_CMD_SYSOFF},
             {"startscp",        no_argument,       0, ERIDAN_CMD_START_SCP},
             {"prepscp",         no_argument,       0, ERIDAN_CMD_PREP_SCP},
@@ -903,6 +954,8 @@ parse_args(int argc, char *argv[])
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
+        char arg1[BUFSIZE];
+        char arg2[BUFSIZE];
 
         c = getopt_long (argc, argv, "h",
                          long_options, &option_index);
@@ -919,107 +972,160 @@ parse_args(int argc, char *argv[])
             break;
 
         case ERIDAN_CMD_GET_FREQ:
-            puts("doing getfreq\n");
-            return do_getfreq();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getfreq%s\n", optarg);
+            return do_getfreq(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_STATS:
-            puts("doing getstats\n");
-            return do_getstats();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getstats%s\n", optarg);
+            return do_getstats(arg1, arg2);
             break;       
 
         case ERIDAN_CMD_SET_FREQ:
-            puts("doing setfreq\n");
-            return do_setfreq();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+                snprintf(arg2, BUFSIZE, "%s", argv[optind]);
+            }
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing setfreq %s %s\n", arg1, arg2);
+            return do_setfreq(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_PWR:
-            puts("doing getpwr\n");
-            return do_getpwr();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getpwr%s\n", optarg);
+            return do_getpwr(arg1, arg2);
             break;
 
         case ERIDAN_CMD_SET_PWR:
-            puts("doing setpwr\n");
-            return do_setpwr();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+                snprintf(arg2, BUFSIZE, "%s", argv[optind]);
+            }
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing setpwr%s\n", optarg);
+            return do_setpwr(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_SAMPLE_RATE:
-            puts("doing getsamplerate\n");
-            return do_getsamplerate();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            printf("doing getsamplerate%s\n"), optarg;
+            return do_getsamplerate(arg1, arg2);
             break;
 
         case ERIDAN_CMD_SET_SAMPLE_RATE:
-            puts("doing setsamplerate\n");
-            return do_setsamplerate();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+                snprintf(arg2, BUFSIZE, "%s", argv[optind]);
+            }
+            printf("doing setsamplerate%s\n", optarg);
+            return do_setsamplerate(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_RXFREQ:
-            puts("doing getrxfreq\n");
-            return do_getrxfreq();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            printf("doing getrxfreq%s\n", optarg);
+            return do_getrxfreq(arg1, arg2);
             break;
 
         case ERIDAN_CMD_SET_RXFREQ:
-            puts("doing setrxfreq\n");
-            return do_setrxfreq();
+            memset(arg1, 0, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+                snprintf(arg2, BUFSIZE, "%s", argv[optind]);
+            }
+            printf("doing setrxfreq%s\n", optarg);
+            return do_setrxfreq(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_RXSAMPLERATE:
-            puts("doing getrxsamplerate\n");
-            return do_getrxsamplerate();
+            memset(arg1, BUFSIZE, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getrxsamplerate %s\n", optarg);
+            return do_getrxsamplerate(arg1, arg2);
             break;
 
         case ERIDAN_CMD_SET_RXSAMPLERATE:
-            puts("doing setrxsamplerate\n");
-            return do_setrxsamplerate();
+            memset(arg1, BUFSIZE, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+                snprintf(arg2, BUFSIZE, "%s", argv[optind]);
+            }
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing setrxsamplerate %s\n", optarg);
+            return do_setrxsamplerate(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_RXGAINS:
-            puts("doing getrxgains\n");
-            return do_getrxgains();
+            memset(arg1, BUFSIZE, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getrxgains %s\n", optarg);
+            return do_getrxgains(arg1, arg2);
             break;
 
         case ERIDAN_CMD_SET_RXGAINS:
-            puts("doing setrxgains\n");
-            return do_setrxgains();
+            memset(arg1, BUFSIZE, sizeof(arg1));
+            memset(arg2, 0, sizeof(arg2));
+            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+                snprintf(arg2, BUFSIZE, "%s", argv[optind]);
+            }
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing setrxgains %s\n", optarg);
+            return do_setrxgains(arg1, arg2);
             break;
 
         case ERIDAN_CMD_SYSOFF:
-            puts("doing sysoff\n");
+            printf("doing sysoff %s\n", optarg);
             return do_sysoff();
             break;
 
         case ERIDAN_CMD_START_SCP:
-            puts("doing startscp\n");
+            printf("doing startscp %s\n", optarg);
             return do_startscp();
             break;
 
         case ERIDAN_CMD_PREP_SCP:
-            puts("doing prepscp\n");
+            printf("doing prepscp %s\n", optarg);
             return do_prepscp();
             break;
 
         case ERIDAN_CMD_RESET_NOW:
-            puts("doing resetnow\n");
+            printf("doing resetnow %s\n", optarg);
             return do_resetnow();
             break;
 
         case ERIDAN_CMD_RESET_DONE:
-            puts("doing resetdone\n");
+            printf("doing resetdone %s\n", optarg);
             return do_resetdone();
             break;
 
         case ERIDAN_CMD_SEND_UPDATES:
-            puts("doing sendupdates\n");
+            printf("doing sendupdates %s\n", optarg);
             return do_sendupdates();
             break;
 
         case ERIDAN_CMD_CHECK_UPDATES:
-            puts("doing checkupdates\n");
+            printf("doing checkupdates %s\n", optarg);
             return do_checkupdates();
             break;
 
         case ERIDAN_CMD_GET_VERSION:
-            puts("doing getversion\n");
+            printf("doing getversion %s\n", optarg);
             return do_getversion();
             break;
 
