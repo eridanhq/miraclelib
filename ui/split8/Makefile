@@ -12,10 +12,10 @@ help:
 	@echo "    bats  : Install Bats files"
 	@echo "    tests : Run unit tests"
 
-client:
+client/ecmctl:
 	(cd client && make)
 
-server:
+server/miracle_controller:
 	(cd server && make)
 
 bats:
