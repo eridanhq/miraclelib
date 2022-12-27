@@ -6,8 +6,14 @@ jobs:
      steps:
        - checkout
        - run:
-           name: "Build Miracle"
+           name: "Build Miraclelib"
            command: make all
+       - run:
+           name: "Build Split E C plane"
+           command: cd ui/split8 && make client && make server
+       - run:
+           name: "Unit tests:"
+           command: cd ui/split8 && make tests
 workflows:
    miracle-workflow:
        jobs:
