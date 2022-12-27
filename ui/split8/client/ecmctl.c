@@ -128,6 +128,35 @@ check_input_side(char *side)
     return ECM_FAILURE;
 }
 
+static inline ecm_ctrl_t
+check_response_hdr(eridan_cmd_hdr_t *hdr)
+{
+    if (hdr == NULL)
+        return ECM_FAILURE;
+
+    if (hdr->cookie != EC_MAGIC_COOKIE)
+        return ECM_FAILURE;
+
+    if (!(hdr->type == EC_TYPE_REQ || hdr->type == EC_TYPE_RESP))
+        return ECM_FAILURE;
+
+    if (hdr->version != EC_VERSION)
+        return ECM_FAILURE;
+
+    return ECM_SUCCESS;
+}
+
+static inline ecm_ctrl_t
+check_response_body(eridan_cmd_hdr_t *hdr, eridan_cmd_resp_t *resp)
+{
+    if (resp == NULL)
+        return ECM_FAILURE;
+
+    /* TODO more checks on response body */
+
+    return ECM_SUCCESS;
+}
+
 ecm_ctrl_t
 send_request(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_id_t cmdid)
 {
@@ -160,6 +189,11 @@ get_response(int sockfd, struct sockaddr_in *servaddr)
         return NULL;
     }
     printf("Recved %d bytes from server\n", n);
+    if (check_response_hdr(hdr) == ECM_FAILURE) {
+        printf("Response header bad\n");
+        free(hdr);
+        return NULL;
+    }
     //reply = (eridan_cmd_hdr_t *)buffer;
     resp = malloc(hdr->length);
     printf("Server : %x\n", hdr->cookie);
@@ -170,6 +204,12 @@ get_response(int sockfd, struct sockaddr_in *servaddr)
     //resp = (eridan_cmd_resp_t *)buffer;
     if (n <= 0) {
         free(hdr);
+        return NULL;
+    }
+    if (check_response_body(hdr, resp) == ECM_FAILURE) {
+        printf("Response body bad\n");
+        free(hdr);
+        free(resp);
         return NULL;
     }
 
