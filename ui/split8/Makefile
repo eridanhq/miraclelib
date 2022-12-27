@@ -22,11 +22,11 @@ server/miracle_controller:
 
 server: server/miracle_controller
 
-bats:
+bats bats/test/libs/bats/bin/bats:
 	mkdir -p bats
 	cd bats && git submodule update
 
-tests: | bats
+tests: bats/test/libs/bats/bin/bats
 	(cd bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client.bats) || /bin/true
 	(cd bats/ && test/libs/bats/bin/bats ../server/tests/ecm_server.bats) || /bin/true
 	(cd bats/ && test/libs/bats/bin/bats ../common/tests/ecm_common.bats) || /bin/true
