@@ -15,8 +15,12 @@ help:
 client/ecmctl:
 	(cd client && make)
 
+client: client/ecmctl
+
 server/miracle_controller:
 	(cd server && make)
+
+server: server/miracle_controller
 
 bats:
 	mkdir -p bats
