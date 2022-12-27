@@ -14,7 +14,7 @@ load '../../bats/test/libs/bats-assert/load'
 
 @test "server exists" {
   echo $PWD/../server/miracle_controller
-  run $PWD/../server/miracle_controller
+  run $PWD/../server/miracle_controller --bg
   [ "$status" -eq 0 ]
 }
 
