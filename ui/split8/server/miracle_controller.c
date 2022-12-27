@@ -519,6 +519,35 @@ handle_get_version(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
     return ECM_SUCCESS;
 }
 
+static inline ecm_ctrl_t
+check_request_hdr(eridan_cmd_hdr_t *hdr)
+{
+    if (hdr == NULL)
+        return ECM_FAILURE;
+ 
+    if (hdr->cookie != EC_MAGIC_COOKIE)
+        return ECM_FAILURE;
+
+    if (!(hdr->type == EC_TYPE_REQ || hdr->type == EC_TYPE_RESP))
+        return ECM_FAILURE;
+
+    if (hdr->version != EC_VERSION)
+        return ECM_FAILURE;
+
+    return ECM_SUCCESS;
+}
+
+static inline ecm_ctrl_t
+check_request_body(eridan_cmd_hdr_t *hdr, eridan_cmd_req_t *req)
+{
+    if (req == NULL)
+        return ECM_FAILURE;
+
+    /* TODO more checks on request body */
+
+    return ECM_SUCCESS;
+}
+
 ecm_ctrl_t
 handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
 {
@@ -536,7 +565,10 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
     printf("Got in cmd type: %x\n",     hdr->type);
     printf("Got in cmd length: %d\n",   hdr->length);
     printf("Got in cmd reserved: %x\n", hdr->reserved);
-
+    if (check_request_hdr(hdr) == ECM_FAILURE) {
+        printf("Request header bad\n");
+        return ECM_FAILURE;
+    }
 
     req   = malloc(sizeof(eridan_cmd_req_t)+hdr->length);
     memset(req, 0, sizeof(eridan_cmd_req_t)+hdr->length);
@@ -545,6 +577,10 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
                         (const struct sockaddr *)&caddr, (unsigned int *)&clen);
     printf("Got cmd : %s\n", cmd_names[req->cmdid]);
     printf("Got req from client\n");
+    if (check_request_body(hdr, req) == ECM_FAILURE) {
+        printf("Request body bad\n");
+        return ECM_FAILURE;
+    }
 
     switch (req->cmdid)
     {
