@@ -24,7 +24,7 @@ server: server/miracle_controller
 
 bats bats/test/libs/bats/bin/bats:
 	mkdir -p bats
-	cd bats && git submodule update
+	cd bats && git submodule init && git submodule update
 
 tests: bats/test/libs/bats/bin/bats
 	(cd bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client.bats) || /bin/true
