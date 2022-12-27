@@ -1,0 +1,14 @@
+version: 2.1
+jobs:
+  miracle-build:
+     machine: true
+     resource_class: eridanhq/demo-test1
+     steps:
+       - checkout
+       - run:
+           name: "Build Miracle"
+           command: make all
+workflows:
+   miracle-workflow:
+       jobs:
+          - miracle-build
