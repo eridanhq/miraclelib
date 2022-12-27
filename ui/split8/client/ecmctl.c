@@ -883,8 +883,8 @@ ecmctl_options_t ecmctl_options[] = {
     {.optname= "getfreq",         .help="Get TX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_GET_FREQ},
     {.optname= "getstats",        .help="Get Radio Stats",            .description="Describe me", .cmdid=ERIDAN_CMD_GET_STATS},
     {.optname= "setfreq",         .help="Set TX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_SET_FREQ},
-    {.optname= "getpwr",          .help="Get TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_GET_PWR},
-    {.optname= "setpwr",          .help="Set TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_SET_PWR},
+    {.optname= "getpower",        .help="Get TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_GET_PWR},
+    {.optname= "setpower",        .help="Set TX Power",               .description="Describe me", .cmdid=ERIDAN_CMD_SET_PWR},
     {.optname= "getsamplerate",   .help="Get TX Samplerate",          .description="Describe me", .cmdid=ERIDAN_CMD_GET_SAMPLE_RATE},
     {.optname= "getrxfreq",       .help="Get RX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_GET_RXFREQ},
     {.optname= "setrxfreq",       .help="Set RX Frequency",           .description="Describe me", .cmdid=ERIDAN_CMD_SET_RXFREQ},
@@ -932,8 +932,8 @@ parse_args(int argc, char *argv[])
             {"getfreq",         required_argument, 0, ERIDAN_CMD_GET_FREQ},
             {"getstats",        required_argument, 0, ERIDAN_CMD_GET_STATS},
             {"setfreq",         required_argument, 0, ERIDAN_CMD_SET_FREQ},
-            {"getpwr",          required_argument, 0, ERIDAN_CMD_GET_PWR},
-            {"setpwr",          required_argument, 0, ERIDAN_CMD_SET_PWR},
+            {"getpower",        required_argument, 0, ERIDAN_CMD_GET_PWR},
+            {"setpower",        required_argument, 0, ERIDAN_CMD_SET_PWR},
             {"getsamplerate",   required_argument, 0, ERIDAN_CMD_GET_SAMPLE_RATE},
             {"setsamplerate",   required_argument, 0, ERIDAN_CMD_SET_SAMPLE_RATE},
             {"getrxfreq",       required_argument, 0, ERIDAN_CMD_GET_RXFREQ},
@@ -1002,7 +1002,7 @@ parse_args(int argc, char *argv[])
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
             snprintf(arg1, BUFSIZE, "%s", optarg);
-            printf("doing getpwr%s\n", optarg);
+            printf("doing getpwr %s\n", optarg);
             return do_getpwr(arg1, arg2);
             break;
 
@@ -1013,14 +1013,15 @@ parse_args(int argc, char *argv[])
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
-            printf("doing setpwr%s\n", optarg);
+            printf("doing setpwr %s\n", optarg);
             return do_setpwr(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_SAMPLE_RATE:
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            printf("doing getsamplerate%s\n"), optarg;
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getsamplerate %s\n"), optarg;
             return do_getsamplerate(arg1, arg2);
             break;
 
@@ -1030,14 +1031,16 @@ parse_args(int argc, char *argv[])
             for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
-            printf("doing setsamplerate%s\n", optarg);
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing setsamplerate %s\n", optarg);
             return do_setsamplerate(arg1, arg2);
             break;
 
         case ERIDAN_CMD_GET_RXFREQ:
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            printf("doing getrxfreq%s\n", optarg);
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing getrxfreq %s\n", optarg);
             return do_getrxfreq(arg1, arg2);
             break;
 
@@ -1047,7 +1050,8 @@ parse_args(int argc, char *argv[])
             for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
-            printf("doing setrxfreq%s\n", optarg);
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            printf("doing setrxfreq %s\n", optarg);
             return do_setrxfreq(arg1, arg2);
             break;
 
