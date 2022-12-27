@@ -392,7 +392,7 @@ handle_start_scp(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 {
     eridan_cmd_resp_t *resp;
     const char *replystr = "DONE";
-    char cmd[1024];
+    char cmd[4096];
     char srcusr[256], srcip[256], srcdir[256];
     char dstusr[256], dstip[256], dstdir[256];
 
@@ -753,7 +753,9 @@ parse_args(int argc, char *argv[])
         };
         /* getopt_long stores the option index here. */
         int option_index = 0;
+        ecm_ctrl_t res;
 
+        (void)res;
         c = getopt_long (argc, argv, "h",
                          long_options, &option_index);
 
@@ -764,7 +766,6 @@ parse_args(int argc, char *argv[])
         switch ((eridan_cmd_id_t)c)
         {
         case 'b':
-            ecm_ctrl_t res;
             daemonize();
             res = start_controller();
             return ECM_SUCCESS;
