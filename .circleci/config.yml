@@ -1,8 +1,10 @@
 version: 2.1
 jobs:
   miracle-build:
-     machine: true
-     resource_class: eridanhq/demo-test1
+    #  machine: true
+    #  resource_class: eridanhq/demo-test1
+     machine:
+      image: ubuntu-2004:2022.10.1
      steps:
        - checkout
        - run:
