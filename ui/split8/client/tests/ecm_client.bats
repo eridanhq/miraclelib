@@ -139,6 +139,7 @@ load '../../bats/test/libs/bats-assert/load'
 }
 
 @test "ecmctl --prepscp" {
+  skip
   run "$PWD/../client/ecmctl" --prepscp
   assert_failure
 }
