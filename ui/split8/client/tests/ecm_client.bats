@@ -1507,9 +1507,15 @@ teardown() {
   [ "$status" -eq 0 ]
 }
 
-@test "Good ecmctl --startscp" {
+@test "Bad ecmctl --startscp" {
   $PWD/../server/miracle_controller --bg
   run "$PWD/../client/ecmctl" --startscp
+  assert_failure
+}
+
+@test "Good ecmctl --startscp /tmp/t1" {
+  $PWD/../server/miracle_controller --bg
+  run "$PWD/../client/ecmctl" --startscp /tmp/t1
   [ "$status" -eq 0 ]
 }
 

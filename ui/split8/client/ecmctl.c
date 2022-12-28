@@ -749,7 +749,7 @@ do_sysoff(void)
 #define EC_DU_IP    "10.1.34.90"
 
 ecm_ctrl_t
-do_startscp(void)
+do_startscp(const char *fname)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
@@ -760,9 +760,9 @@ do_startscp(void)
     get_request(ERIDAN_CMD_START_SCP, 6, &hdr, &req);
     hdr->length += 6 * EC_CHAR_STR_SIZE;
     req->num_args = 6;
-    strcpy(req->cmd_args,                    "user1");
+    strcpy(req->cmd_args,                    getenv("USER"));
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
-    strcpy(req->cmd_args+2*EC_CHAR_STR_SIZE, "/opt/img1.gz");
+    strcpy(req->cmd_args+2*EC_CHAR_STR_SIZE, fname);
     strcpy(req->cmd_args+3*EC_CHAR_STR_SIZE, EC_RU_USER);
     strcpy(req->cmd_args+4*EC_CHAR_STR_SIZE, EC_RU_IP);
     strcpy(req->cmd_args+5*EC_CHAR_STR_SIZE, EC_RU_PATH);
@@ -1023,7 +1023,7 @@ parse_args(int argc, char *argv[])
             {"getrxgains",      required_argument, 0, ERIDAN_CMD_GET_RXGAINS},
             {"setrxgains",      required_argument, 0, ERIDAN_CMD_SET_RXGAINS},
             {"sysoff",          no_argument,       0, ERIDAN_CMD_SYSOFF},
-            {"startscp",        no_argument,       0, ERIDAN_CMD_START_SCP},
+            {"startscp",        required_argument, 0, ERIDAN_CMD_START_SCP},
             {"prepscp",         no_argument,       0, ERIDAN_CMD_PREP_SCP},
             {"resetnow",        no_argument,       0, ERIDAN_CMD_RESET_NOW},
             {"resetdone",       no_argument,       0, ERIDAN_CMD_RESET_DONE},
@@ -1180,7 +1180,8 @@ parse_args(int argc, char *argv[])
 
         case ERIDAN_CMD_START_SCP:
             printf("doing startscp %s\n", optarg);
-            return do_startscp();
+            snprintf(arg1, BUFSIZE, "%s", optarg);
+            return do_startscp(arg1);
             break;
 
         case ERIDAN_CMD_PREP_SCP:
