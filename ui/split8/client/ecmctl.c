@@ -409,7 +409,6 @@ do_setpwr(char *side, char *pwr)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
@@ -417,6 +416,7 @@ do_setpwr(char *side, char *pwr)
         return ECM_FAILURE;
     if (check_input_power(pwr) == ECM_FAILURE)
         return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_PWR, 2, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 2;
@@ -446,12 +446,12 @@ do_getsamplerate(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
         return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_SAMPLE_RATE, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
@@ -480,12 +480,12 @@ do_setsamplerate(char *side, char *srate)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
         return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_SAMPLE_RATE, 2, &hdr, &req);
     hdr->length += 2*EC_CHAR_STR_SIZE;
     req->num_args = 2;
@@ -515,12 +515,12 @@ do_getrxfreq(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
         return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_RXFREQ, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
@@ -549,7 +549,6 @@ do_setrxfreq(char *side, char *rxfreq)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
@@ -557,6 +556,7 @@ do_setrxfreq(char *side, char *rxfreq)
         return ECM_FAILURE;
     if (check_input_float(rxfreq) == ECM_FAILURE)
         return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_RXFREQ, 2, &hdr, &req);
     hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
@@ -586,12 +586,12 @@ do_getrxsamplerate(char *side, char *none)
 {
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
-    int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
         return ECM_FAILURE;
+    int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_GET_RXSAMPLERATE, 1, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
     req->num_args = 1;
