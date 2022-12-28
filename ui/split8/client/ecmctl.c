@@ -743,6 +743,11 @@ do_sysoff(void)
     return ECM_SUCCESS;
 }
 
+#define EC_RU_USER  "root"
+#define EC_RU_PATH  "/root"
+#define EC_RU_IP    "10.1.34.34"
+#define EC_DU_IP    "10.1.34.90"
+
 ecm_ctrl_t
 do_startscp(void)
 {
@@ -758,9 +763,9 @@ do_startscp(void)
     strcpy(req->cmd_args,                    "user1");
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
     strcpy(req->cmd_args+2*EC_CHAR_STR_SIZE, "/opt/img1.gz");
-    strcpy(req->cmd_args+3*EC_CHAR_STR_SIZE, "user2");
-    strcpy(req->cmd_args+4*EC_CHAR_STR_SIZE, "10.1.32.90");
-    strcpy(req->cmd_args+5*EC_CHAR_STR_SIZE, "/root/img2.gz");
+    strcpy(req->cmd_args+3*EC_CHAR_STR_SIZE, EC_RU_USER);
+    strcpy(req->cmd_args+4*EC_CHAR_STR_SIZE, EC_RU_IP);
+    strcpy(req->cmd_args+5*EC_CHAR_STR_SIZE, EC_RU_PATH);
     send_request_out(sockfd, &servaddr, hdr, req);
 
     printf("StartSCP message sent.\n");
