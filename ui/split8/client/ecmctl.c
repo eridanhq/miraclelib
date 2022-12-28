@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <getopt.h>
+#include <errno.h>
 #include <sys/time.h>
 #include <sys/types.h> 
 #include <sys/socket.h> 
@@ -100,6 +101,30 @@ send_request_out(int sockfd, struct sockaddr_in *servaddr, eridan_cmd_hdr_t *hdr
     sendto(sockfd,  (const char *)req, hdr->length,
                     MSG_CONFIRM,
                     (const struct sockaddr *) servaddr, sizeof(*servaddr));
+
+    return ECM_SUCCESS;
+}
+
+static inline ecm_ctrl_t
+check_input_power(char *pwr)
+{
+    if (pwr == NULL)
+        return ECM_FAILURE;
+
+    return ECM_SUCCESS;
+}
+static inline ecm_ctrl_t
+check_input_float(char *in)
+{
+    float f1;
+    char *end;
+
+    if (in == NULL)
+        return ECM_FAILURE;
+
+    f1 = strtof(in, &end);
+    if (errno != 0 || *end != '\0')
+        return ECM_FAILURE;
 
     return ECM_SUCCESS;
 }
@@ -318,6 +343,8 @@ do_setfreq(char *side, char *freq)
 
     if (check_input_side(side) == ECM_FAILURE)
         return ECM_FAILURE;
+    if (check_input_float(freq) == ECM_FAILURE)
+        return ECM_FAILURE;
     int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_FREQ, 2, &hdr, &req);
     req->num_args = 2;
@@ -387,6 +414,8 @@ do_setpwr(char *side, char *pwr)
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    if (check_input_power(pwr) == ECM_FAILURE)
         return ECM_FAILURE;
     get_request(ERIDAN_CMD_SET_PWR, 2, &hdr, &req);
     hdr->length += EC_CHAR_STR_SIZE;
@@ -526,6 +555,8 @@ do_setrxfreq(char *side, char *rxfreq)
 
     if (check_input_side(side) == ECM_FAILURE)
         return ECM_FAILURE;
+    if (check_input_float(rxfreq) == ECM_FAILURE)
+        return ECM_FAILURE;
     get_request(ERIDAN_CMD_SET_RXFREQ, 2, &hdr, &req);
     hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
@@ -593,6 +624,8 @@ do_setrxsamplerate(char *side, char *rxsrate)
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    if (check_input_float(rxsrate) == ECM_FAILURE)
         return ECM_FAILURE;
     int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_RXSAMPLERATE, 2, &hdr, &req);
@@ -662,6 +695,8 @@ do_setrxgains(char *side, char *rxgains)
     eridan_cmd_req_t *req;
 
     if (check_input_side(side) == ECM_FAILURE)
+        return ECM_FAILURE;
+    if (check_input_float(rxgains) == ECM_FAILURE)
         return ECM_FAILURE;
     int sockfd = connect_to_server(&servaddr);
     get_request(ERIDAN_CMD_SET_RXGAINS, 2, &hdr, &req);
