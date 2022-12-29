@@ -423,6 +423,18 @@ teardown() {
   done
 }
 
+@test "Multi: 1000 RX getrxfreq" {
+  # must start miracle_controller
+  $PWD/../server/miracle_controller --bg
+  for i in {1..1000}
+  do
+    run "$PWD/../client/ecmctl" --getrxfreq TRX1
+    [ "$status" -eq 0 ]
+    run "$PWD/../client/ecmctl" --getrxfreq TRX2
+    [ "$status" -eq 0 ]
+  done
+}
+
 @test "Multi: 10000 RX getrxfreq" {
   # must start miracle_controller
   $PWD/../server/miracle_controller --bg
