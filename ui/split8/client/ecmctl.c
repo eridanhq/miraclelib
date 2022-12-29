@@ -862,19 +862,72 @@ do_resetdone(void)
     return ECM_SUCCESS;
 }
 
+#define EC_RU_UPDATE_PORT  8034
+
+ecm_ctrl_t
+start_update(int port)
+{
+    int sockfd;
+    int optval;
+    struct sockaddr_in saddr, caddr;
+
+    sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+    if (sockfd < 0)
+    {
+        printf("ERROR opening socket");
+        return ECM_FAILURE;
+    }
+
+    /* setsockopt: Handy debugging trick that lets
+     * us rerun the server immediately after we kill it;
+     * otherwise we have to wait about 20 secs.
+     * Eliminates "ERROR on binding: Address already in use" error.
+     */
+    optval = 1;
+    setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR,
+               (const void *)&optval , sizeof(int));
+
+    memset((char *) &saddr, 0, sizeof(saddr));
+    saddr.sin_family = AF_INET;
+    saddr.sin_addr.s_addr = htonl(INADDR_ANY);
+    saddr.sin_port = htons((unsigned short)port);
+
+    if (bind(sockfd, (struct sockaddr *) &saddr,
+                     sizeof(saddr)) < 0)
+    {
+        printf("ERROR on binding");
+        close(sockfd);
+        return ECM_FAILURE;
+    }
+
+    //udpfd = sockfd;
+
+    return ECM_SUCCESS;
+}
+
+ecm_ctrl_t
+start_update_thread(int port)
+{
+    return start_update(port);
+}
+
 ecm_ctrl_t
 do_sendupdates(void)
 {
+    char  pstr[1024];
     eridan_cmd_resp_t *resp;
     struct sockaddr_in  servaddr;
     int sockfd = connect_to_server(&servaddr);
     eridan_cmd_hdr_t *hdr;
     eridan_cmd_req_t *req;
 
+    memset(pstr, 0, sizeof(pstr));
+    snprintf(pstr, sizeof(pstr), "%d", EC_RU_UPDATE_PORT);
+    start_update_thread(EC_RU_UPDATE_PORT);
     get_request(ERIDAN_CMD_SEND_UPDATES, 2, &hdr, &req);
     hdr->length += 2 * EC_CHAR_STR_SIZE;
     req->num_args = 2;
-    strcpy(req->cmd_args,                    "3453");
+    strcpy(req->cmd_args,                    pstr);
     strcpy(req->cmd_args+EC_CHAR_STR_SIZE,   "10.1.32.34");
     send_request_out(sockfd, &servaddr, hdr, req);
 

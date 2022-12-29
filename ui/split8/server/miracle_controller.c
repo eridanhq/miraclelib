@@ -40,7 +40,7 @@ start_server(int port)
     if (sockfd < 0)
     {
         printf("ERROR opening socket");
-        return (0);
+        return ECM_FAILURE;
     }
 
     /* setsockopt: Handy debugging trick that lets 
