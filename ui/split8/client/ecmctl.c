@@ -201,7 +201,7 @@ eridan_cmd_resp_t *
 get_response(int sockfd, struct sockaddr_in *servaddr)
 {
     int n, len;
-    eridan_cmd_hdr_t *req, *hdr, *reply;
+    eridan_cmd_hdr_t *hdr;
     eridan_cmd_resp_t *resp;
 
     hdr = malloc(sizeof(eridan_cmd_hdr_t));
@@ -1123,7 +1123,7 @@ parse_args(int argc, char *argv[])
         case ERIDAN_CMD_SET_FREQ:
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+            for (; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
@@ -1142,7 +1142,7 @@ parse_args(int argc, char *argv[])
         case ERIDAN_CMD_SET_PWR:
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+            for (; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
@@ -1161,7 +1161,7 @@ parse_args(int argc, char *argv[])
         case ERIDAN_CMD_SET_SAMPLE_RATE:
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+            for (; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
@@ -1180,7 +1180,7 @@ parse_args(int argc, char *argv[])
         case ERIDAN_CMD_SET_RXFREQ:
             memset(arg1, 0, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+            for (; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
@@ -1199,7 +1199,7 @@ parse_args(int argc, char *argv[])
         case ERIDAN_CMD_SET_RXSAMPLERATE:
             memset(arg1, BUFSIZE, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+            for (; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
@@ -1218,7 +1218,7 @@ parse_args(int argc, char *argv[])
         case ERIDAN_CMD_SET_RXGAINS:
             memset(arg1, BUFSIZE, sizeof(arg1));
             memset(arg2, 0, sizeof(arg2));
-            for (int i = 0; optind < argc && *argv[optind] != '-'; optind++) {
+            for (; optind < argc && *argv[optind] != '-'; optind++) {
                 snprintf(arg2, BUFSIZE, "%s", argv[optind]);
             }
             snprintf(arg1, BUFSIZE, "%s", optarg);
