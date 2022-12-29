@@ -74,7 +74,7 @@ $(OBJS): %.o : *.h %.c
 .PHONY: tests
 
 tests: ../bats
-	(cd ../bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client.bats)
+	(cd ../bats/ && test/libs/bats/bin/bats ../client/tests/ecm_client*.bats)
 
 clean:
 	# rm -f *.elf *.gdb *.o
