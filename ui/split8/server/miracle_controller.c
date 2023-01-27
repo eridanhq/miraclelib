@@ -7,6 +7,7 @@
 #include <string.h>
 #include <getopt.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
@@ -34,7 +35,7 @@ start_server(int port)
 {
     int sockfd;
     int optval;
-    struct sockaddr_in saddr, caddr;
+    struct sockaddr_in saddr;
 
     sockfd = socket(AF_INET, SOCK_DGRAM, 0);
     if (sockfd < 0)
@@ -424,6 +425,7 @@ handle_start_scp(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 ecm_ctrl_t
 handle_prep_scp(eridan_cmd_req_t *req)
 {
+    (void) *req;
     return ECM_SUCCESS;
 }
 
@@ -449,6 +451,7 @@ handle_reset_now(eridan_cmd_req_t *req, eridan_cmd_resp_t **presp)
 ecm_ctrl_t
 handle_reset_done(eridan_cmd_req_t *req)
 {
+    (void)req;
     return ECM_SUCCESS;
 }
 
@@ -540,6 +543,8 @@ check_request_hdr(eridan_cmd_hdr_t *hdr)
 static inline ecm_ctrl_t
 check_request_body(eridan_cmd_hdr_t *hdr, eridan_cmd_req_t *req)
 {
+    (void)hdr;
+    (void)req;
     if (req == NULL)
         return ECM_FAILURE;
 
@@ -549,7 +554,7 @@ check_request_body(eridan_cmd_hdr_t *hdr, eridan_cmd_req_t *req)
 }
 
 ecm_ctrl_t
-handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
+handle_cmds(char *rbuf, struct sockaddr *caddr)
 {
     eridan_cmd_hdr_t *hdr, *reply;
     eridan_cmd_req_t *req;
@@ -572,9 +577,11 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
 
     req   = malloc(sizeof(eridan_cmd_req_t)+hdr->length);
     memset(req, 0, sizeof(eridan_cmd_req_t)+hdr->length);
-    n = recvfrom(udpfd, (const char *)req, sizeof(eridan_cmd_req_t)+hdr->length,
+    n = recvfrom(udpfd, (char *)req, sizeof(eridan_cmd_req_t)+hdr->length,
                         0,
-                        (const struct sockaddr *)&caddr, (unsigned int *)&clen);
+                        (struct sockaddr *)&caddr, (unsigned int *)&clen);
+    if (n <= 0)
+        return ECM_FAILURE;
     printf("Got cmd : %s\n", cmd_names[req->cmdid]);
     printf("Got req from client\n");
     if (check_request_body(hdr, req) == ECM_FAILURE) {
@@ -700,15 +707,20 @@ handle_cmds(char *rbuf, int rlen, struct sockaddr *caddr)
 ecm_ctrl_t
 handle_conns(void)
 {
-    struct  sockaddr_in saddr, caddr;
+    struct  sockaddr_in caddr;
     char    rbuf[1024];
     ssize_t n;
     int     nready;
 
     for (;;) {
-        printf("fdset :%hu udpfd:%hu\n", fdset, udpfd);
+        //printf("fdset :%x udpfd:%x\n", fdset, udpfd);
         nready = select(udpfd+5, &fdset, NULL, NULL, NULL);
 
+        if (nready == 0) continue;
+        if (nready == -1) {
+            printf("Error from select");
+            continue;
+        }
         if (FD_ISSET(lfd, &fdset)) {
             printf("Unsupported right now");
         }
@@ -717,10 +729,13 @@ handle_conns(void)
             memset(rbuf, 0, sizeof(rbuf));
             n = recvfrom(udpfd, rbuf, sizeof(eridan_cmd_hdr_t), 0,
                          (struct sockaddr *)&caddr, (unsigned int *)&clen);
-            handle_cmds(rbuf, sizeof(rbuf), (struct sockaddr *)&caddr);
+            if (n <= 0)
+                continue;
+            handle_cmds(rbuf, (struct sockaddr *)&caddr);
         }
     }
 }
+
 void
 Usage(void)
 {
@@ -772,6 +787,16 @@ daemonize(void)
 }
 
 ecm_ctrl_t
+start_controller(void)
+{
+    ecm_ctrl_init();
+    start_server(EC_SERVER_PORT);
+    handle_conns();
+
+    return ECM_SUCCESS;
+}
+
+ecm_ctrl_t
 parse_args(int argc, char *argv[])
 {
     int c;
@@ -799,7 +824,7 @@ parse_args(int argc, char *argv[])
         if (c == -1)
             break;
 
-        switch ((eridan_cmd_id_t)c)
+        switch ((char)c)
         {
         case 'b':
             daemonize();
@@ -827,16 +852,6 @@ parse_args(int argc, char *argv[])
             printf ("%s ", argv[optind++]);
         putchar ('\n');
     }
-    return ECM_SUCCESS;
-}
-
-ecm_ctrl_t
-start_controller(void)
-{
-    ecm_ctrl_init();
-    start_server(EC_SERVER_PORT);
-    handle_conns();
-
     return ECM_SUCCESS;
 }
 
